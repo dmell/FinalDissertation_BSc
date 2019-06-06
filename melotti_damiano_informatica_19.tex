@@ -47,7 +47,7 @@
 %% Sezione Ringraziamenti opzionale
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \input{ringraziamenti}
+  \input{chapters/acknoledgments}
   \clearpage
   \pagestyle{plain} % nessuna intestazione e pie pagina con numero al centro
 
@@ -98,7 +98,7 @@
       \titlespacing*{\subsection}{0pt}{0.10in}{0.02in}
       
       % sommario
-      \input{sommario}
+      \input{chapters/abstract}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Nota
@@ -120,9 +120,10 @@
       %
       % \input oppure \include
       %
-      \input{capitolo1}
-      \input{capitolo2}
-      \input{capitolo3}
+      \input{chapters/background}
+      \input{chapters/mywork}
+      \input{chapters/future}
+      \input{chapters/conclusion}
       %\input{capitolo4}
       
       
@@ -132,7 +133,7 @@
     % bibliografia in formato bibtex
     %
     % aggiunta del capitolo nell'indice
-    \addcontentsline{toc}{chapter}{Bibliografia}
+    \addcontentsline{toc}{chapter}{Bibliography}
     % stile con ordinamento alfabetico in funzione degli autori
     \bibliographystyle{plain}
     \bibliography{biblio}
@@ -163,12 +164,5 @@
 %%   Se disponibile, inserire la data di ultima consultazione della risorsa (gg/mm/aaaa).    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
-
-    \titleformat{\chapter}
-        {\normalfont\Huge\bfseries}{Allegato \thechapter}{1em}{}
-    % sezione Allegati - opzionale
-    \appendix
-    \input{allegati}
 
 \end{document}
