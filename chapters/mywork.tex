@@ -54,21 +54,19 @@ LoRa (Long Range) is a patented digital wireless data communication technology t
 
 LoRaWAN provides various classes of end devices to address different requirements. It ensures a better battery life compared to the other LPWAN technologies, but this also implies lower data rates and longer latency. To connect to the Internet, LoRa requires a gateway. The infrastructure is the following: end devices communicate with one or more LoRa gateways, which then forward messages to a cloud, a network server or to another gateway. On the contrary, when a message is sent to a device, the network chooses the best gateway.
 
-One important aspect of LoRaWAN is determined by the so-called duty-cycle: defined as the maximum percentage of time during which an end-device can occupy a channel, is a key constraint for networks operating in unlicensed bands. Thus, each device has a threshold limiting the overall transmission time. However, the amount that a device will need is unknown, since it depends on the distance between the end point and the nearest gateway. The farther the gateway, the longer it will take to deliver a message. As a result, the total amount of messages sent is unknown and totally unpredictable considering our use case, in which we cannot make assumptions on the distribution of the gateways (w.r.t. the location of the tracker).
+One important aspect of LoRaWAN is determined by the so-called duty-cycle: defined as the maximum percentage of time during which an end-device can occupy a channel, is a key constraint for networks operating in unlicensed bands. Thus, each device has a threshold limiting the overall transmission time. However, the amount of time that a device will need is unknown, since it depends on the distance between the end point and the nearest gateway. The farther the gateway, the longer it will take to deliver a message. As a result, the total amount of messages sent is unknown and totally unpredictable considering our use case, in which we cannot make assumptions on the distribution of the gateways (w.r.t. the location of the tracker).
 
-To sum up: LoRaWAN is not proprietary and offers quite a good amount of flexibility, but it has some problems of coverage and infrastructure that does not make it the best choice.
+%To sum up: LoRaWAN is not proprietary and offers quite a good amount of flexibility, but it has some problems of coverage and infrastructure that does not make it the best choice.
 
 \subsubsection{Sigfox}
-Sigfox is a patented technology that was developed in 2010 by the start-up SigFox. It is an LPWAN network operator that uses a wide-reaching signal called ``ultra narrow-band''. This system presents a significant link asymmetry: a downlink communication, i.e., data from the base stations to the end devices can only occur following an uplink communication and in every case the number of messages is limited to four per day. On the uplink, instead, the amount of packets sent cannot be more than 140 per day, with a maximum payload length of 12 bytes. Clearly, acknowledgements cannot be supported and consequently the reliability is ensured using time and frequency diversity as well as transmission duplication.
-
-Sigfox is an interesting technology, but it has similar limitations to LoRaWAN as regards the messages that can be sent: in fact, they were included by the designers for the same reasons.
+Sigfox is a patented technology that was developed in 2010 by the start-up SigFox. It is an LPWAN network operator that uses a wide-reaching signal called ``ultra narrow-band''. This system presents a significant link asymmetry: a downlink communication, i.e., data from the base stations to the end devices can only occur following an uplink communication and in every case the number of messages is limited to 4 per day. On the uplink, instead, the amount of packets sent cannot be more than 140 per day, with a maximum payload length of 12 bytes. These limitations are similar to the LoRa's ones: in fact, they were included by the designers for the same reasons. Clearly, acknowledgements cannot be supported and consequently the reliability is ensured using time and frequency diversity as well as transmission duplication.
 
 \subsubsection{NB-IoT}
 NB-IoT is a radio technology standard developed by 3GPP (3rd Generation Partnership Project) to enable a wide range of cellular devices and services. It is based on the LTE protocol, therefore guaranteeing the high performance level associated with cellular connections, but at the cost of more complexity and greater power consumption. While other infrastructures have gateways that aggregate sensor data, which then communicate with the primary server, with NB-IoT sensor data is sent directly to it. For this reason it is being touted as the potentially less expensive option.
 
 LTE-M is another LPWAN radio technology standard based on LTE. However, we did not take it into consideration because there is a lack of coverage and support from operators in Italy.
 
-We can conclude that, for our use case, the NB-IoT is the best alternative: despite the higher battery usage, it offers a solid and unrestricted network that can be used without creating a particular infrastructure or having to limit the number of messages.
+%We can conclude that, for our use case, the NB-IoT is the best alternative: despite the higher battery usage, it offers a solid and unrestricted network that can be used without creating a particular infrastructure or having to limit the number of messages.
 
 
 \subsection{The market}
@@ -76,7 +74,7 @@ We can conclude that, for our use case, the NB-IoT is the best alternative: desp
 
 The market of the IoT is constantly growing. There are numerous applications for these devices, both indoors and outdoors, with a variety of different requirements. For this reason almost every company offers more than one solution, to best meet the needs of the buyer. We proceed now with the analysis of some candidate trackers. Table \ref{table_devices} summarizes their technical features.
 
-\begin{table}[h]
+\begin{table}[H]
 \centering
 \newcolumntype{Y}{>{\raggedright \arraybackslash}X}
 \begin{tabularx}{\textwidth}{YYYYYY}
@@ -109,14 +107,17 @@ Sensolus \cite{sensolus} is an industrial IoT company, based in Belgium. Their m
 
 This is another device not open to personalization. However, the cloud offers numerous APIs to read data sent by the trackers: the overhead is still present, but our server could coexist. Concerning the battery, the presence of a replaceable one is a double-edged sword, because on the one hand it is can ensure longer life, but on the other it requires an action to change it.
 
+This is the only device only supporting Sigfox connectivity: the APIs are actually an extension of those offered by the operator. As pointed out in the previous section, this communication technology has some limitations in the number of messages that can be sent, which inevitably affect this tracker too.
+
 \subsubsection{Pycom, Fipy and PyTrack}
 Pycom \cite{pycom} offers hardware products that vary from plug and play devices to single components such as development boards and accessories. There are two separate products that together can form a good tracking solution: a development board (FiPy) and an additional module to support geolocalization (PyTrack).
 
-This alternative is completely different from the other ones: instead of offering an entire environment, almost ready to use, this device comes completely empty and needs to be programmed. Even the battery is not present, so one can decide which one to use, or directly power it via cable.
+This alternative is completely different from the other ones: instead of offering an entire environment, almost ready to use, this device comes completely empty and needs to be programmed. Even the battery is not present, so one can decide which one to use, or directly power it via cable. 
 
-\subsection{Pycom}
+\subsection{The choice}
 \label{sec:track_choice}
 \textit{Why we decided to choose that device: possibility to fully program the firmware, connectivity...}
+
 
 \subsection{Firmware}
 \label{sec:track_firmware}
