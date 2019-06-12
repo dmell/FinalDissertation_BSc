@@ -74,19 +74,21 @@ We can conclude that, for our use case, the NB-IoT is the best alternative: desp
 \subsection{The market}
 \textit{The study and testing of the alternatives available, maybe a table summarizing the characteristics of each device (type of communication supported, battery, personalization of firmware, cost).}
 
-The market of the IoT is constantly growing. There are numerous applications for these devices, both indoors and outdoors, with a variety of different requirements. For this reason almost every company offers more than one solution, to best meet the needs of the buyer. Table We proceed now with the analysis of some candidate trackers, outlining the specifications of each of them.
+The market of the IoT is constantly growing. There are numerous applications for these devices, both indoors and outdoors, with a variety of different requirements. For this reason almost every company offers more than one solution, to best meet the needs of the buyer. We proceed now with the analysis of some candidate trackers. Table \ref{table_devices} summarizes their technical features.
 
 \begin{table}[h]
 \centering
 \newcolumntype{Y}{>{\raggedright \arraybackslash}X}
 \begin{tabularx}{\textwidth}{YYYYYY}
 \toprule
-Company        & Device         & Connectivity                                                          & GNSS                                & Customizable firmware           & Additional                                           \\ \midrule
+\textbf{Company}        & \textbf{Device}         & \textbf{Connectivity}                                                          & \textbf{GNSS}                                & \textbf{Customizable firmware}           & \textbf{Additional}                                           \\ \midrule
 Estimote       & LTE beacon     & Bluetooth 5.0, LTE-M/NB-IoT, NFC                                      & GPS, GALILEO, GLONASS               & No, but scripts can be included & accelerometer, temperature, LED, programmable button \\ \midrule
 Accent Systems & IoT tracker    & Bluetooth 5.0, Wi-Fi, LTE-M/NB-IoT                                    & GPS, GLONASS, Galileo, QZSS, BeiDou & No                              & accelerometer, temperature, LED, buzzer              \\ \midrule
 Sensolus       & Ultra          & BLE, Wi-Fi, Sigfox, GPS                                               & GPS                                 & No, but cloud API available     & accelerometer, temperature                           \\ \midrule
 Pycom          & FiPy + PyTrack & Bluetooth, Wi-Fi, LTE-M/NB-IoT, LoRa, Sigfox & GPS, GLONASS, Galileo, QZSS         & Yes                             & accelerometer, LED                                   \\ \bottomrule
 \end{tabularx}
+\caption{Specifications of the devices}
+\label{table_devices}
 \end{table}
 
 \subsubsection{Estimote, LTE beacon}
@@ -94,22 +96,23 @@ Estimote, Inc. \cite{estimote} is an American company that offers mostly beacons
 
 This tracker can connect to the Estimote cloud over LTE. Through this platform it is possible to include JavaScript code that will be run by the device, but the firmware itself is not customizable. This is the first negative point: every communication of the device is directed to its cloud and it is not possible to bypass it. Furthermore, the LTE beacon comes with a subscription including 1000 syncs per year per each device (for example, about 2-3 syncs per day). There’s also a data-cap of 100 MB per year.
 
-Even though the tracker offers a very good range of sensors and built-in radios, the limitations on the number of packets and the necessity to pass from its cloud make us definitely discard this candidate.
+%Even though the tracker offers a very good range of sensors and built-in radios, the limitations on the number of packets and the necessity to pass from its cloud make us definitely discard this candidate.
+The tracker offers a good range of sensors and built-in radios. On the other hand, though, Estimote claims that, if frequently synced with the server, the battery life will be shorter than 2 days. Consequently, choosing the LTE beacon would imply the need of an external power bank or a permanent connection to the vehicle.
 
 \subsubsection{Accent Systems, IoT tracker}
 Accent Systems \cite{accentsys} designs and develops tailored IoT devices, offering an end-to-end solution. Like Estimote, they have a wide range of beacons and one particular device for outdoor tracking via LPWANs, called IoT tracker.
 
-This solution is not personalizable in any way. The firmware is not modifiable and it communicates with a platform called Inmolecular, a built-in ecosystem to show the tracker's data. The IoT tracker, as specified in the website, is more destined to be integrated in an asset or in a vehicle to track only its location, not really to send custom packets as our project requires. Therefore, this restrictions cause its exclusion.
+This solution is not personalizable in any way. The firmware is not modifiable and it communicates with a platform called Inmolecular (over LTE), a built-in ecosystem to show the tracker's data. The device, as specified in the website, is more destined to be integrated in an asset or in a vehicle to track only its location, not really to send custom packets as our project requires. Nevertheless, its characteristics make it a valid alternative.
 
 \subsubsection{Sensolus, Ultra}
 Sensolus \cite{sensolus} is an industrial IoT company, based in Belgium. Their main offer is addressed to logistic companies that want to track their assets. Indeed they propose an easy and ready-to-go service, similarly to the Accent Systems' one. Ultra is the tracker that we considered as a potential solution.
 
-This is another device not open to personalization. However, the cloud offers numerous APIs to read data sent by the trackers: the overhead is still present, but our server could coexist.
+This is another device not open to personalization. However, the cloud offers numerous APIs to read data sent by the trackers: the overhead is still present, but our server could coexist. Concerning the battery, the presence of a replaceable one is a double-edged sword, because on the one hand it is can ensure longer life, but on the other it requires an action to change it.
 
 \subsubsection{Pycom, Fipy and PyTrack}
-Pycom \cite{pycom} offers hardware products that vary from plug and play devices to single components such as development boards and accessories. There are two separate products that together can form a good tracking solution: a development board (FiPy) and an additional module to support localization (PyTrack).
+Pycom \cite{pycom} offers hardware products that vary from plug and play devices to single components such as development boards and accessories. There are two separate products that together can form a good tracking solution: a development board (FiPy) and an additional module to support geolocalization (PyTrack).
 
-This alternative is completely different from the other ones: instead of offering an entire environment, almost ready to use, this device comes completely empty and needs to be programmed. 
+This alternative is completely different from the other ones: instead of offering an entire environment, almost ready to use, this device comes completely empty and needs to be programmed. Even the battery is not present, so one can decide which one to use, or directly power it via cable.
 
 \subsection{Pycom}
 \label{sec:track_choice}
