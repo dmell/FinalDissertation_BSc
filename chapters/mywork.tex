@@ -105,9 +105,9 @@ This solution is not personalizable in any way. The firmware is not modifiable a
 \subsubsection{Sensolus, Ultra}
 Sensolus \cite{sensolus} is an industrial IoT company, based in Belgium. Their main offer is addressed to logistic companies that want to track their assets. Indeed they propose an easy and ready-to-go service, similarly to the Accent Systems' one. Ultra is the tracker that we considered as a potential solution.
 
-This is another device not open to personalization. However, the cloud offers numerous APIs to read data sent by the trackers: the overhead is still present, but our server could coexist. Concerning the battery, the presence of a replaceable one is a double-edged sword, because on the one hand it is can ensure longer life, but on the other it requires an action to change it.
+This is another device not open to personalization. However, the cloud exposes numerous APIs to read data sent by the trackers: the overhead is still present, but our server could coexist. Concerning the battery, the presence of a replaceable one is a double-edged sword, because on the one hand it is can ensure longer life, but on the other it requires an action to change it.
 
-This is the only device only supporting Sigfox connectivity: the APIs are actually an extension of those offered by the operator. As pointed out in the previous section, this communication technology has some limitations in the number of messages that can be sent, which inevitably affect this tracker too.
+This device only supports Sigfox connectivity: the APIs are actually an extension of those provided by the operator. As pointed out in the previous section, this communication technology has some limitations in the number of messages that can be sent, which inevitably affect this tracker too.
 
 \subsubsection{Pycom, Fipy and PyTrack}
 Pycom \cite{pycom} offers hardware products that vary from plug and play devices to single components such as development boards and accessories. There are two separate products that together can form a good tracking solution: a development board (FiPy) and an additional module to support geolocalization (PyTrack).
@@ -118,10 +118,66 @@ This alternative is completely different from the other ones: instead of offerin
 \label{sec:track_choice}
 \textit{Why we decided to choose that device: possibility to fully program the firmware, connectivity...}
 
+Analyzing the various alternatives outlined we opted for the Pycom device. The first reason is the possibility of fully programming the firmware, which guarantees a high level of flexibility. Indeed, we need a complete control on the device: the algorithm needs to be elaborated and written by us. With all the other solutions, this would not possible; building our service on top of another one was not ideal.
+
+In addition, the FiPy board offers a wide range of communication technologies that we could use: from the simple Wi-Fi for the developing phase to all the mentioned LPWANs. As for the latter, we identified NB-IoT the best technology. Similarly to the previous decision, we made this choice because, despite the higher battery consumption, it offers a solid, reliable and unrestricted network, which can be used without creating a particular infrastructure or having to limit the number of messages.
 
 \subsection{Firmware}
 \label{sec:track_firmware}
 \textit{Life cycle of the device (maybe with a flow chart). Some snippets?}
+
+As aforementioned, the chosen devices allow us to program its firmware completely. The programming language to be used is MicroPython \cite{micropy}, an implementation of Python 3 optimized for integrate controllers or constrained environments. It includes a subset of Python libraries, together with some modules specific to the MicroPython implementation.
+
+The firmware is composed by two fundamental files: \texttt{boot.py} and \texttt{main.py}. When booting the device they are executed automatically. Usually the first is used to prepare the connectivity and perform the needed preliminary actions, while the second is the algorithm itself.
+
+Figure \ref{flowchart} describes the device's life cycle. After booting, it attaches to the LTE network and initializes the Bluetooth and GPS sensors. Then, it tries to find the coordinates until it succeeds (actually, in the real implementation, a check is added, to handle cases in which it is impossible to locate the tracker; in other words, there is a maximum number of attempts). After the BLE scan, it checks whether the connection is still on: this is necessary because the dealer might have arrived in an area where there is no signal. Successively, it sends the data to the server, or it stores them in an internal file. Clearly, when the file is not empty and there is connection, the device will send the saved packets too. Finally, it turns off for a specific number of seconds, which is configurable.
+
+% block styles
+\tikzstyle{decision} = [diamond, draw, 
+    text width=5.4em, text badly centered, node distance=3cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw,
+    text width=5em, text centered, minimum height=4em]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+    minimum height=2em]
+    
+\begin{figure}[H]
+%\begin{center}
+\begin{tikzpicture}[node distance = 3cm, auto]
+	% nodes
+	\node [cloud] (start) {Start};
+	\node [block, right of=start, yshift=-3em] (lte) {Attach to LTE};
+	\node [block, right of=lte, xshift=1em] (initble) {Init Bluetooth};
+	\node [block, right of=initble, xshift=1em] (initgnss) {Init GNSS};
+	\node [block, below of=initble, yshift=-1em] (coord) {Search coordinates};
+	\node [decision, right of=coord, xshift=1em] (foundcoord) {Coordinates found?};
+	\node [block, below of=foundcoord, xshift=6em, yshift=-1em] (ble) {BLE scan};
+	\node [decision, below of=ble] (conn) {Connected?};
+	\node [block, left of=conn, xshift=-1em] (save) {Save to file};
+	\node [block, right of=conn, xshift=1em] (send) {Send data};
+	\node [block, below of=conn] (sleep) {Sleep for X minutes};
+	% edges
+	\path [line] (start) |- (lte);
+	\path [line] (lte) -- (initble);
+	\path [line] (initble) -- (initgnss);
+	\path [line] (initgnss.south) -| ++(0pt, -15pt) -| (coord.north);
+	\path [line] (coord) -- (foundcoord);
+	\path [line] (foundcoord.south) |- node [near start] {no} ++(0pt,-20pt) -| (coord);
+	\path [line] (foundcoord.east) -| node [near start] {yes} ++(20pt,0pt) -| (ble);
+	\path [line] (ble) -- (conn);
+	\path [line] (conn) -- node [near start] {yes} (send);
+	\path [line] (conn) -- node [near start] {no} (save);
+	\path [line] (save.south) |- ++(0pt, -20pt) |- (sleep);
+	\path [line] (send.south) |- ++(0pt, -20pt) |- (sleep);
+	\path [line] (sleep.south) -| ++(0pt, -15pt) -| (lte);
+	
+\end{tikzpicture}
+%\end{center}
+
+\caption{Flowchart of the tracker's algorithm}
+\label{flowchart}
+\end{figure}
+
 
 \section{Decentralized architecture}
 \label{sec:arch}
