@@ -1,6 +1,6 @@
-\chapter{My work}
+\chapter{The solution}
 \label{cha:main}
-\textit{Schema of the final solution, explanation of the flow and how it concretely works. Then, focus on three key components.}
+%\textit{Schema of the final solution, explanation of the flow and how it concretely works. Then, focus on three key components.}
 
 \begin{figure}[H]
     \centering
@@ -9,7 +9,7 @@
     \label{fig:solution}
 \end{figure}
 
-Figure \ref{fig:solution} illustrates the solution that I have elaborated during my internship. Let us explain its characteristics, by first analyzing the overall flow and then concentrating in each step.
+Figure \ref{fig:solution} illustrates the solution that we have elaborated. Let us explain its characteristics, by first analyzing the overall flow and then concentrating in each step.
 
 The notation used in the schema is the same as the one introduced in chapter \ref{cha:background}: from left to right, we notice the sender \textit{S}, the good \textit{G}, two dealers $D_1$ and $D_2$, two intermediate points $I_1$ and $I_2$ (each one with a responsible person at work) and finally the receiver $R$. Obviously, this scenario is just a possible combination of entities and the solution is not fixed to this one.
 
@@ -26,7 +26,7 @@ Then, the delivery is ready to start. $D_i$ (the procedure holds for both $D_1$ 
 
 The model as it is so far cannot be deceived by the dealer, as they have no control over the device; however, it is vulnerable to an attack from a malicious actor controlling $I$. They can, in fact, collect $G$ and not inform the system about the exchange. As a result, we have lost track of who has the good. To solve this, there is the need for a protocol on the ``human'' side. Not complicated, but essential: the dealer has to make sure that who receives $G$ really sends their confirmation to the server. 
 
-The final recipient, at any time, can access an interface that, by consulting the status of G on the blockchain, informs him about the progress of the delivery. They can check which exchanges happened and whether they succeeded. In case of problems it is immediate to find the responsible. Assuming that the protocol has been fully respected, if $G$ is only confirmed by the dealer it means that it is still in their hands; to the contrary, if only the intermediary confirmed the good an error must have occurred, because there is no proof that the dealer really arrived at that place.
+The final recipient, at any time, can access an interface that, by consulting the status of G on the blockchain, informs him about the progress of the delivery. They can check which exchanges happened and whether they succeeded. In case of problems it is immediate to find the responsible. Assuming that the protocol has been fully respected, if $G$ is only confirmed by the dealer it means that it is still in their hands; to the contrary, if only the intermediary confirmed the good, an error must have occurred, because there is no proof that the dealer really arrived at that place.
 
 After this brief analysis there are a lot of unknown elements: how the devices work, how the communications take place, how the data is actually saved. In the next sections we will discuss these aspects, dividing the project into the three main branches that constitute it.
 
@@ -41,7 +41,7 @@ First, we will give a brief description of the modern technologies for the commu
 
 \subsection{Communication technologies}
 \label{sec:track_comm}
-\textit{A brief analysis over the existing tracking technologies}
+%\textit{A brief analysis over the existing tracking technologies}
 
 The state-of-the-art of these networks is very wide and presents several alternatives, each of them with advantages and disadvantages. They can be divided by many parameters, since many variables need to be taken into account when modelling the architecture of an IoT project. Our use case requires a standard able to guarantee the delivery of packets at arbitrary distance, consuming as little battery as possible. These requirements drive us to a new wireless communication techonology: LPWAN (Low Power Wide Area Network).
 
@@ -50,7 +50,7 @@ LPWAN is increasingly becoming popular thanks to its low-power, long-range and l
 Many LPWAN technologies have been developed in both the licensed and unlicensed frequency bands. LoRa, Sigfox and NB-IoT are today the leading ones, with many technical differences \cite{LPWAN_study}.
 
 \subsubsection{LoRa}
-LoRa (Long Range) is a patented digital wireless data communication technology that was first developed by Cycleo - a French start-up - and then acquired by Semtech (USA). Its ecosystem can be divided in two parts, LoRa and LoRaWAN: the latter is the standard protocol for WAN communications and the former is used as a wide area network technology. In other words, LoRa is the physical layer and LoRaWAN is the MAC and application layer of the stack.
+LoRa (Long Range) is a patented digital wireless communication technology that was first developed by Cycleo - a French start-up - and then acquired by Semtech (USA). Its ecosystem can be divided in two parts, LoRa and LoRaWAN: the latter is the standard protocol for WAN communications and the former is used as a wide area network technology. In other words, LoRa is the physical layer and LoRaWAN is the MAC and application layer of the stack.
 
 LoRaWAN provides various classes of end devices to address different requirements. It ensures a better battery life compared to the other LPWAN technologies, but this also implies lower data rates and longer latency. To connect to the Internet, LoRa requires a gateway. The infrastructure is the following: end devices communicate with one or more LoRa gateways, which then forward messages to a cloud, a network server or to another gateway. On the contrary, when a message is sent to a device, the network chooses the best gateway.
 
@@ -70,11 +70,11 @@ LTE-M is another LPWAN radio technology standard based on LTE. However, we did n
 
 
 \subsection{The market}
-\textit{The study and testing of the alternatives available, maybe a table summarizing the characteristics of each device (type of communication supported, battery, personalization of firmware, cost).}
+%\textit{The study and testing of the alternatives available, maybe a table summarizing the characteristics of each device (type of communication supported, battery, personalization of firmware, cost).}
 
 The market of the IoT is constantly growing. There are numerous applications for these devices, both indoors and outdoors, with a variety of different requirements. For this reason almost every company offers more than one solution, to best meet the needs of the buyer. We proceed now with the analysis of some candidate trackers. Table \ref{table_devices} summarizes their technical features.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \newcolumntype{Y}{>{\raggedright \arraybackslash}X}
 \begin{tabularx}{\textwidth}{YYYYYY}
@@ -116,7 +116,7 @@ This alternative is completely different from the other ones: instead of offerin
 
 \subsection{The choice}
 \label{sec:track_choice}
-\textit{Why we decided to choose that device: possibility to fully program the firmware, connectivity...}
+%\textit{Why we decided to choose that device: possibility to fully program the firmware, connectivity...}
 
 Analyzing the various alternatives outlined we opted for the Pycom device. The first reason is the possibility of fully programming the firmware, which guarantees a high level of flexibility. Indeed, we need a complete control on the device: the algorithm needs to be elaborated and written by us. With all the other solutions, this would not possible; building our service on top of another one was not ideal.
 
@@ -124,13 +124,7 @@ In addition, the FiPy board offers a wide range of communication technologies th
 
 \subsection{Firmware}
 \label{sec:track_firmware}
-\textit{Life cycle of the device (maybe with a flow chart). Some snippets?}
-
-As aforementioned, the chosen devices allow us to program its firmware completely. The programming language to be used is MicroPython \cite{micropy}, an implementation of Python 3 optimized for integrate controllers or constrained environments. It includes a subset of Python libraries, together with some modules specific to the MicroPython implementation.
-
-The firmware is composed by two fundamental files: \texttt{boot.py} and \texttt{main.py}. When booting the device they are executed automatically. Usually the first is used to prepare the connectivity and perform the needed preliminary actions, while the second is the algorithm itself.
-
-Figure \ref{flowchart} describes the device's life cycle. After booting, it attaches to the LTE network and initializes the Bluetooth and GPS sensors. Then, it tries to find the coordinates until it succeeds (actually, in the real implementation, a check is added, to handle cases in which it is impossible to locate the tracker; in other words, there is a maximum number of attempts). After the BLE scan, it checks whether the connection is still on: this is necessary because the dealer might have arrived in an area where there is no signal. Successively, it sends the data to the server, or it stores them in an internal file. Clearly, when the file is not empty and there is connection, the device will send the saved packets too. Finally, it turns off for a specific number of seconds, which is configurable.
+%\textit{Life cycle of the device (maybe with a flow chart). Some snippets?}
 
 % block styles
 \tikzstyle{decision} = [diamond, draw, 
@@ -142,7 +136,6 @@ Figure \ref{flowchart} describes the device's life cycle. After booting, it atta
     minimum height=2em]
     
 \begin{figure}[H]
-%\begin{center}
 \begin{tikzpicture}[node distance = 3cm, auto]
 	% nodes
 	\node [cloud] (start) {Start};
@@ -172,16 +165,20 @@ Figure \ref{flowchart} describes the device's life cycle. After booting, it atta
 	\path [line] (sleep.south) -| ++(0pt, -15pt) -| (lte);
 	
 \end{tikzpicture}
-%\end{center}
-
 \caption{Flowchart of the tracker's algorithm}
 \label{flowchart}
 \end{figure}
 
 
+As aforementioned, the chosen device allow us to program its firmware completely. The programming language to be used is MicroPython \cite{micropy}, an implementation of Python 3 optimized for integrate controllers or constrained environments. It includes a subset of Python libraries, together with some modules specific to the MicroPython implementation.
+
+The firmware is composed by two fundamental files: \texttt{boot.py} and \texttt{main.py}. When booting the device they are executed automatically. Usually the first is used to prepare the connectivity and perform the needed preliminary actions, while the second is the algorithm itself.
+
+Figure \ref{flowchart} describes the device's life cycle. After booting, it attaches to the LTE network and initializes the Bluetooth and GPS sensors. Then, it tries to find the coordinates until it succeeds (actually, in the real implementation, a check is added, to handle cases in which it is impossible to locate the tracker; in other words, there is a maximum number of attempts). After the BLE scan, it checks whether the connection is still on: this is necessary because the dealer might have arrived in an area where there is no signal. Successively, it sends the data to the server, or it stores it in an internal file. Clearly, when the file is not empty and there is connection, the device will send the saved packets too. Finally, it turns off for a specific number of seconds, which is configurable.
+
 \section{Decentralized architecture}
 \label{sec:arch}
-\textit{Requirements of the architectures, same as \ref{sec:tracking} (what we expect etc).}
+\textit{Requirements of the architecture, same as \ref{sec:tracking} (what we expect etc).}
 
 \subsection{Decentralization alternatives}
 \label{sec:alternatives}
@@ -189,9 +186,9 @@ Figure \ref{flowchart} describes the device's life cycle. After booting, it atta
 
 \subsection{HyperLedger}
 \label{sec:hyperledger}
-\textit{Why (free and open source, easy to use, easy to install and deploy - mentioning Docker), description of what it is and how it works. Schema with their grammar of our network.}
+\textit{Why (free and open source, easy to use, easy to install and deploy - mentioning Docker), description of what it is and how it works. Schema of our network using their notation.}
 
 
 \section{Interfaces/Servers}
-\textit{Small section with a bit of reference about the webapps and how they work, what should be allowed. Some snippets can be useful here, explaining how we make use of hyperledger APIs. A little paragraph describing what MQTT is and why we decided to use it.}
+\textit{Small section with a bit of reference about the web servers and how they work. Some snippets can be useful here, explaining how we make use of the HyperLedger APIs. A little paragraph describing what MQTT is and why we decided to use it.}
 
