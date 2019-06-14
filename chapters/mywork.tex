@@ -178,15 +178,23 @@ Figure \ref{flowchart} describes the device's life cycle. After booting, it atta
 
 \section{Decentralized architecture}
 \label{sec:arch}
-\textit{Requirements of the architecture, same as \ref{sec:tracking} (what we expect etc).}
+%\textit{Requirements of the architecture, same as \ref{sec:tracking} (what we expect etc).}
+
+After the individuation of the IoT devices, the second fundamental part of the project is the architecture. We already introduced in \ref{sec:decentralization} the intention of using a distributed network, possibly implementing a blockchain. However, there are different solutions that make use of this data structure to create a distributed ledger, that need to be analyzed. Unlike the previous sections, however, this time the decision will be more straightforward.
 
 \subsection{Decentralization alternatives}
 \label{sec:alternatives}
-\textit{Distributed databases, how they reach consensus, permissioned vs permissionless, blockchain based frameworks.}
+%\textit{Distributed databases, how they reach consensus, permissioned vs permissionless, blockchain based frameworks.}
+There are two main alternatives for a blockchain-based architecture: permissionless and permissioned \cite{consensus_protocols}. In a permissionless blockchain, such as the cryptocurrencies ones, anyone can be a node of network, write in the shared ledger by proposing new transactions (that have to be validated) and participate in the process to reach consensus. In this scenario, the absence of trust is typically mitigated by introducing the ``mining'', a computational expensive process required to validate transactions. The term mining derives from the compensation given to the nodes that manage to approve a block, in form of transactions fees or new coins.
+
+In contrast, permissioned blockchains are composed by known entities, which can be members of a consortium or stakeholders in a given business context; different methods are implemented to control and update the state, and there can be particular strategies to limit who can issue transactions. In this case, the risk of a malicious behaviour from a participant is considerably lower, because the guilty can be determined more easily. 
+
+In our use case, the choice is simple: we have a precise set of participants that have a common goal, we want to make data available only to the nodes that need it and we do not plan to include a mining process. A permissioned blockchain is absolutely the best solution. Also concerning the framework, we did not consider many alternatives. There is one that perfectly suits our needs: HyperLedger Fabric.
 
 \subsection{HyperLedger}
 \label{sec:hyperledger}
-\textit{Why (free and open source, easy to use, easy to install and deploy - mentioning Docker), description of what it is and how it works. Schema of our network using their notation.}
+%\textit{Why (free and open source, easy to use, easy to install and deploy - mentioning Docker), description of what it is and how it works. Schema of our network using their notation.}
+HyperLedger is 
 
 
 \section{Interfaces/Servers}
