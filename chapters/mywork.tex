@@ -189,13 +189,44 @@ There are two main alternatives for a blockchain-based architecture: permissionl
 
 In contrast, permissioned blockchains are composed by known entities, which can be members of a consortium or stakeholders in a given business context; different methods are implemented to control and update the state, and there can be particular strategies to limit who can issue transactions. In this case, the risk of a malicious behaviour from a participant is considerably lower, because the guilty can be determined more easily. 
 
-In our use case, the choice is simple: we have a precise set of participants that have a common goal, we want to make data available only to the nodes that need it and we do not plan to include a mining process. A permissioned blockchain is absolutely the best solution. Also concerning the framework, we did not consider many alternatives. There is one that perfectly suits our needs: HyperLedger Fabric.
+In our use case, the choice is simple: we have a precise set of participants that have a common goal, we want to make data available only to the nodes that need it and we do not plan to include a mining process. A permissioned blockchain is absolutely the best solution. Also concerning the framework, we did not consider many alternatives. There is one that perfectly suits our needs: HyperLedger Fabric. 
 
-\subsection{HyperLedger}
+\subsection{Hyperledger}
 \label{sec:hyperledger}
 %\textit{Why (free and open source, easy to use, easy to install and deploy - mentioning Docker), description of what it is and how it works. Schema of our network using their notation.}
-HyperLedger is 
+Hyperledger \cite{hyperledger} is ``an open source collaborative effort created to advance cross-industry blockchain technologies''. In other words, it is a group of related projects and tools, started by the Linux Foundation and supported by many IT companies (such as IBM and Intel), with the goal of offering blockchain-based solutions to build innovative applications. Under the Hyperledger ``umbrella'', there are several frameworks that range from permissionless to permissioned networks, with different targets. In particular, Fabric is the most interesting project: it offers a distributed ledger platform designed for industries, with a versatile and highly configurable architecture. It supports even pluggable consensus protocols and identity management protocols, enabling a full customization basing on the use case. Moreover, it is free, easy to use, install and deploy. Every peer of the network runs in Docker containers and the configuration of the network is made significantly simpler by tools like Composer and Explorer.
 
+We have introduced a lot of elements that should be singularly explained. In the following sections we will describe accurately how Hyperledger Fabric works, how it is composed and how we built our network.
+
+\subsection{Hyperledger Fabric structure}
+%The first characteristic of Fabric is that it is private and permissioned. The participants of a Fabric network, indeed, have to enroll via an MSP (Membership Service Provider). This guarantees a complete control of the network and the possibility of identifying different types of members. Before describing these different roles, however, we need to introduce a component that has not been mentioned yet, smart contracts.
+In this section we will describe the main building blocks of Hyperledger Fabric.
+
+\subsubsection{Assets}
+
+
+\subsubsection{Smart contracts}
+Smart contracts are another concept related to a blockchain network: in general, they are self-executing actions that are triggered by some conditions. For example Ethereum, another cryptocurrency based on a permissionless blockchain, allows developers to program their ``autonomous agents'', using a particular DSL (Domain Specific Language), Solidity. A smart contract can be used, for instance, so that funds are spent only when all the members of an organization (or a percentage) give their authorization. 
+
+In the Hyperledger environment, a smart contract defines the business logic that controls the lifecycle of the assets. It is also called ``chaincode'', interchangeably, even though the former is the transaction logic itself, while the latter is the container of a group of contracts which is then deployed in the network. 
+
+In our use case, smart contracts are used to manipulate the state of the goods.
+
+\subsubsection{Ledger}
+
+
+\subsubsection{Peers}
+Being one of the main reasons for which we chose this framework, the first characteristic of Fabric is that it is private and permissioned. The participants of a Fabric network, indeed, have to enroll via an MSP (Membership Service Provider). This guarantees a complete control of the network and the possibility of identifying different types of members. 
+
+\begin{description}
+    \item General peers:
+    \item Endorser peers:
+    \item Anchor peers:
+    \item Orderer peers:
+\end{description}
+
+\subsection{Hyperledger Composer and Explorer}
+How we used them to build the network
 
 \section{Interfaces/Servers}
 \textit{Small section with a bit of reference about the web servers and how they work. Some snippets can be useful here, explaining how we make use of the HyperLedger APIs. A little paragraph describing what MQTT is and why we decided to use it.}
