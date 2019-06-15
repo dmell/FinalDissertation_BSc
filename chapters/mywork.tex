@@ -203,30 +203,64 @@ We have introduced a lot of elements that should be singularly explained. In the
 In this section we will describe the main building blocks of Hyperledger Fabric.
 
 \subsubsection{Assets}
+Assets are the virtual coins exchanged in the Fabric environment. They can represent anything for which transactions are made. More specifically, they can be real products, like cars or houses, or intangible goods, like intellectual properties.
 
+Concretely, assets are represented in the system as collections of key-value pair, usually in JSON dictionaries. Every update of the assets is saved in the ledger.
+
+In our system, as outlined previously, the assets are the goods being delivered. Their state is altered during the exchanges, through the submission of transactions, but the final recipient is always able to check every modification occurred.
 
 \subsubsection{Smart contracts}
-Smart contracts are another concept related to a blockchain network: in general, they are self-executing actions that are triggered by some conditions. For example Ethereum, another cryptocurrency based on a permissionless blockchain, allows developers to program their ``autonomous agents'', using a particular DSL (Domain Specific Language), Solidity. A smart contract can be used, for instance, so that funds are spent only when all the members of an organization (or a percentage) give their authorization. 
+% in ETH transazioni scatenano contratti
+% ETH non è una crypto, è blockchain
+% fare capire che è un programma, Turing complete bla bla
+Smart contracts are another concept related to a blockchain network: in general, they are self-executing scripts that are triggered by some conditions. For example Ethereum, another popular permissionless blockchain \cite{ethereum}, allows developers to program their ``autonomous agents'', using a particular DSL (Domain Specific Language), Solidity. This language is Turing-complete, so the smart contracts are concretely real programs, that can perform a wide range of actions. They can be used, for instance, so that funds are spent only when all the members of an organization (or a percentage) give their authorization. 
 
 In the Hyperledger environment, a smart contract defines the business logic that controls the lifecycle of the assets. It is also called ``chaincode'', interchangeably, even though the former is the transaction logic itself, while the latter is the container of a group of contracts which is then deployed in the network. 
 
-In our use case, smart contracts are used to manipulate the state of the goods.
+In our use case, smart contracts are used to manipulate the state of the goods. The functions are executed on the ledger’s current state and are triggered by a transaction proposal. The result is a set of key-value pairs that can be applied to the ledger and distributed over all peers.
 
 \subsubsection{Ledger}
+Focusing now on the ledger itself, it can be described as the list of transactions maintained by each member of the network. It is composed by two parts. First, the ``chain'', which is the log of all transactions that have been made, kept in the tamper-resistant blockchain with all the properties outlined in \ref{sec:decentralization}. Second, the ``world state'', representing the latest values for all the keys. 
 
+The current state is very important because it is the layer directly involved when transactions are submitted. To improve efficiency it is stored in a state database (such as LevelDB or CouchDB), which is basically an indexed view of the transaction log. It can always be regenerated from the chain.
+
+The ledger contains also configuration blocks defining essential information such as access control lists and policies. We will explain better these concepts in \ref{sec:composer}, to report how we used them.
 
 \subsubsection{Peers}
-Being one of the main reasons for which we chose this framework, the first characteristic of Fabric is that it is private and permissioned. The participants of a Fabric network, indeed, have to enroll via an MSP (Membership Service Provider). This guarantees a complete control of the network and the possibility of identifying different types of members. 
+Being one of the main reasons for which we chose this framework, the first characteristic of Fabric is that it is private and permissioned. The members of a network, indeed, have to enroll via an MSP (Membership Service Provider). This guarantees a complete control of the infrastructure and the possibility of identifying directly all the participants.
+
+More precisely, each organization is responsible for setting up their peers. Each of them hosts an instance of the ledger and an instance of chaincode. As a result, redundancy is specifically introduced, to avoid single points of failure. Unlike public blockchains, though, the various peers have different roles, which we will list here. In the following section, a typical transaction flow will help understanding better how these roles come into play.
 
 \begin{description}
-    \item General peers:
-    \item Endorser peers:
-    \item Anchor peers:
-    \item Orderer peers:
+    \item Orderer peers: the central nodes that group transactions in blocks and delivers them to all the other peers. They represent the direct source of consensus.
+    \item Endorsing peers: the specialized peers designed to validate transactions. Fabric introduces them to increase scalability.
+    \item Anchor peers: the discoverable peers that receive updates from the the orderers and broadcast them inside their organization.
+    \item General peers: ordinary peers, that can submit transactions from their client applications.
 \end{description}
 
+\textit{Missing: how the peers of our network represent these roles}
+
+\subsubsection{Transactions}
+We can summarize the typical Fabric workflow in six steps.
+
+\begin{enumerate}
+    \item A general node invokes a transaction request. This can be done though a client application.
+    \item The general peer broadcasts the proposal to the required set of endorsing peers. How they are chosen depends on the endorsement policy defined for a chaincode, but intuitively it will be composed by the endorsing peers of each organization involved in that transaction proposal.
+    \item Each of them checks the details needed to validate the transaction and runs the chaincode, independently. After that, they generate a response, containing the approval or the rejection of the proposal. 
+    \item After receiving the needed number of positive responses, the peer sends the approved transaction to an orderer, to ensure that it is included in the ledger.
+    \item Ordering nodes receive transactions from many different application clients concurrently. Their task is to work together to collectively form the ordering service, arranging batches of submitted transactions into a well-defined sequence and package them into blocks. After this, they have to forward the new block to the anchor nodes.
+    \item Anchor nodes finally forward the block to the other peers inside their own organization. These individual peers then update their local ledger.
+\end{enumerate}
+
+\subsubsection{Consensus}
+Consensus is a fundamental problem in distributed computing: in a nutshell, it consists in reaching an agreement among a collection of distributed processes.
+As demonstrated by Fisher et al. \cite{consensus_impossible}, reaching consensus in a distributed system, under the hypothesis of faulty nodes and unreliable communications, is impossible. However, a good distributed system always exhibits stable intervals of correct functioning during which consensus is achieved, in practice. 
+
+\textit{How Hyperledger ensures consensus, reference to kafka and solo from the docs and the paper} 
+
 \subsection{Hyperledger Composer and Explorer}
-How we used them to build the network
+\label{sec:composer}
+\textit{How we used them to build the network}
 
 \section{Interfaces/Servers}
 \textit{Small section with a bit of reference about the web servers and how they work. Some snippets can be useful here, explaining how we make use of the HyperLedger APIs. A little paragraph describing what MQTT is and why we decided to use it.}
