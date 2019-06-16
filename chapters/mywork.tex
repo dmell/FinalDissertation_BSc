@@ -189,23 +189,22 @@ There are two main alternatives for a blockchain-based architecture: permissionl
 
 In contrast, permissioned blockchains are composed by known entities, which can be members of a consortium or stakeholders in a given business context; different methods are implemented to control and update the state, and there can be particular strategies to limit who can issue transactions. In this case, the risk of a malicious behaviour from a participant is considerably lower, because the guilty can be determined more easily. 
 
-In our use case, the choice is simple: we have a precise set of participants that have a common goal, we want to make data available only to the nodes that need it and we do not plan to include a mining process. A permissioned blockchain is absolutely the best solution. Also concerning the framework, we did not consider many alternatives. There is one that perfectly suits our needs: HyperLedger Fabric. 
+In our use case, the choice is simple: we have a precise set of participants that have a common goal, we want to make data available only to the nodes that need it and we do not plan to include a mining process. A permissioned blockchain is absolutely the best solution. Also concerning the framework, we did not consider many alternatives. There is one that perfectly suits our needs: Hyperledger Fabric. 
 
 \subsection{Hyperledger}
 \label{sec:hyperledger}
 %\textit{Why (free and open source, easy to use, easy to install and deploy - mentioning Docker), description of what it is and how it works. Schema of our network using their notation.}
-Hyperledger \cite{hyperledger} is ``an open source collaborative effort created to advance cross-industry blockchain technologies''. In other words, it is a group of related projects and tools, started by the Linux Foundation and supported by many IT companies (such as IBM and Intel), with the goal of offering blockchain-based solutions to build innovative applications. Under the Hyperledger ``umbrella'', there are several frameworks that range from permissionless to permissioned networks, with different targets. In particular, Fabric is the most interesting project: it offers a distributed ledger platform designed for industries, with a versatile and highly configurable architecture. It supports even pluggable consensus protocols and identity management protocols, enabling a full customization basing on the use case. Moreover, it is free, easy to use, install and deploy. Every peer of the network runs in Docker containers and the configuration of the network is made significantly simpler by tools like Composer and Explorer.
+Hyperledger \cite{hyperledger} is ``an open source collaborative effort created to advance cross-industry blockchain technologies''. In other words, it is a group of related projects and tools, started by the Linux Foundation and supported by many IT companies (such as IBM and Intel), with the goal of offering blockchain-based solutions to build innovative applications. Under the Hyperledger ``umbrella'', there are several frameworks that range from permissionless to permissioned networks, with different targets. In particular, Fabric is the most interesting project for us: it offers a distributed ledger platform designed for industries, with a versatile and highly configurable architecture. It supports even pluggable consensus protocols and identity management protocols, enabling a full customization basing on the use case. Moreover, it is free, easy to use, install and deploy. Every peer of the network runs in Docker containers and the configuration of the network is made significantly simpler by tools like Composer and Explorer.
 
 We have introduced a lot of elements that should be singularly explained. In the following sections we will describe accurately how Hyperledger Fabric works, how it is composed and how we built our network.
 
 \subsection{Hyperledger Fabric structure}
-%The first characteristic of Fabric is that it is private and permissioned. The participants of a Fabric network, indeed, have to enroll via an MSP (Membership Service Provider). This guarantees a complete control of the network and the possibility of identifying different types of members. Before describing these different roles, however, we need to introduce a component that has not been mentioned yet, smart contracts.
 In this section we will describe the main building blocks of Hyperledger Fabric.
 
 \subsubsection{Assets}
 Assets are the virtual coins exchanged in the Fabric environment. They can represent anything for which transactions are made. More specifically, they can be real products, like cars or houses, or intangible goods, like intellectual properties.
 
-Concretely, assets are represented in the system as collections of key-value pair, usually in JSON dictionaries. Every update of the assets is saved in the ledger.
+Concretely, assets are represented in the system as collections of key-value pairs, usually in JSON dictionaries. Every update of the assets is saved in the ledger.
 
 In our system, as outlined previously, the assets are the goods being delivered. Their state is altered during the exchanges, through the submission of transactions, but the final recipient is always able to check every modification occurred.
 
@@ -213,7 +212,7 @@ In our system, as outlined previously, the assets are the goods being delivered.
 % in ETH transazioni scatenano contratti
 % ETH non è una crypto, è blockchain
 % fare capire che è un programma, Turing complete bla bla
-Smart contracts are another concept related to a blockchain network: in general, they are self-executing scripts that are triggered by some conditions. For example Ethereum, another popular permissionless blockchain \cite{ethereum}, allows developers to program their ``autonomous agents'', using a particular DSL (Domain Specific Language), Solidity. This language is Turing-complete, so the smart contracts are concretely real programs, that can perform a wide range of actions. They can be used, for instance, so that funds are spent only when all the members of an organization (or a percentage) give their authorization. 
+Smart contracts are another concept related to a blockchain network: in general, they are self-executing scripts that are triggered by some conditions. For example Ethereum, another popular permissionless blockchain \cite{ethereum}, allows developers to program their ``autonomous agents'', using a particular DSL (Domain Specific Language), Solidity. This language is Turing-complete, so the smart contracts are concretely real programs, that can perform a wide range of actions. They can be used, for instance, so that funds are spent only when all the members of an organization (or a fixed percentage of them) give their authorization. 
 
 In the Hyperledger environment, a smart contract defines the business logic that controls the lifecycle of the assets. It is also called ``chaincode'', interchangeably, even though the former is the transaction logic itself, while the latter is the container of a group of contracts which is then deployed in the network. 
 
@@ -235,16 +234,18 @@ More precisely, each organization is responsible for setting up their peers. Eac
     \item Orderer peers: the central nodes that group transactions in blocks and delivers them to all the other peers. They represent the direct source of consensus.
     \item Endorsing peers: the specialized peers designed to validate transactions. Fabric introduces them to increase scalability.
     \item Anchor peers: the discoverable peers that receive updates from the the orderers and broadcast them inside their organization.
-    \item General peers: ordinary peers, that can submit transactions from their client applications.
+    \item General peers: ordinary peers, that can submit transactions from their client applications. They basically act as proxies to connect clients to validating peers.
 \end{description}
 
 \textit{Missing: how the peers of our network represent these roles}
+
+It can be pointed out that an orderer peer is potentially a single point of failure, thus exposing a Fabric network to the same problems of a traditional centralized architecture. If there is only one orderer node, this is true, but a real solution (in production) should consider this issue and avoid it. This point will be better clarified in the consensus section.
 
 \subsubsection{Transactions}
 We can summarize the typical Fabric workflow in six steps.
 
 \begin{enumerate}
-    \item A general node invokes a transaction request. This can be done though a client application.
+    \item A general node invokes a transaction request. This can be done through a client application.
     \item The general peer broadcasts the proposal to the required set of endorsing peers. How they are chosen depends on the endorsement policy defined for a chaincode, but intuitively it will be composed by the endorsing peers of each organization involved in that transaction proposal.
     \item Each of them checks the details needed to validate the transaction and runs the chaincode, independently. After that, they generate a response, containing the approval or the rejection of the proposal. 
     \item After receiving the needed number of positive responses, the peer sends the approved transaction to an orderer, to ensure that it is included in the ledger.
@@ -254,9 +255,17 @@ We can summarize the typical Fabric workflow in six steps.
 
 \subsubsection{Consensus}
 Consensus is a fundamental problem in distributed computing: in a nutshell, it consists in reaching an agreement among a collection of distributed processes.
-As demonstrated by Fisher et al. \cite{consensus_impossible}, reaching consensus in a distributed system, under the hypothesis of faulty nodes and unreliable communications, is impossible. However, a good distributed system always exhibits stable intervals of correct functioning during which consensus is achieved, in practice. 
+As demonstrated by Fischer et al. \cite{consensus_impossible}, reaching consensus in a distributed system, under the hypothesis of faulty nodes and unreliable communications, is impossible. However, a good distributed system always exhibits stable intervals of correct functioning during which consensus is achieved, in practice. 
 
-\textit{How Hyperledger ensures consensus, reference to kafka and solo from the docs and the paper} 
+In Hyperledger Fabric the consensus problem is approached with the introduction of orderer nodes. Unlike permissionless blockchains, in which every node can participate in the consensus process and the algorithms involved guarantee consistency at a high probability, the ordering service ensures deterministic consensus. That is, in Ethereum or Bitcoin it is possible the generation of divergent ledgers, namely ``forks'', because the order of accepted transactions is not the same. A possible cause is the case of two (or more) miners forging different blocks at roughly the same time. These blockchains still have mechanisms to contrast this vulnerability, accepting only the longest chain and abandoning the so-called ``orphaned blocks''. However, the risk exists, while in Fabric once a block is generated it is guaranteed to be correct and final by design.
+
+The documentation of Fabric presents several different implementations to achieve consensus in ordering service nodes. It is worth noting that no BFT (Byzantine Fault Tolerant) protocols are currently available, so the system is not capable of reaching agreement in the case of malicious nodes.
+\begin{itemize}
+    \item Solo, as the name suggests, features only one orderer node. Obviously, it is not fault tolerant, as it presents a centralized and vulnerable element. It cannot be a valid approach in production, but it can be useful when testing the architecture, because, from the other elements perspective, transactions are processed in the same way as with more complicated protocols. 
+    \item Raft \cite{raft} is a CFT (Crash Fault Tolerant) protocol that has been introduced in v1.4.1. The underlying model includes a dynamically elected node which acts as a leader, that distributes its decisions among the others.
+    \item Kafka \cite{kafka}
+\end{itemize}
+%\textit{How Hyperledger ensures consensus, reference to kafka and solo from the docs and the paper} 
 
 \subsection{Hyperledger Composer and Explorer}
 \label{sec:composer}
