@@ -11,7 +11,7 @@
 
 Figure \ref{fig:solution} illustrates the solution that we have elaborated. Let us explain its characteristics, by first analyzing the overall flow and then concentrating in each step.
 
-The notation used in the schema is the same as the one introduced in chapter \ref{cha:background}: from left to right, we notice the sender \textit{S}, the good \textit{G}, two dealers $D_1$ and $D_2$, two intermediate points $I_1$ and $I_2$ (each one with a responsible person at work) and finally the receiver $R$. Obviously, this scenario is just a possible combination of entities and the solution is not fixed to this one.
+The notation used in the schema is the same as the one introduced in Chapter \ref{cha:background}: from left to right, we notice the sender \textit{S}, the good \textit{G}, two dealers $D_1$ and $D_2$, two intermediate points $I_1$ and $I_2$ (each one with a responsible person at work) and finally the receiver $R$. Obviously, this scenario is just a possible combination of entities and the solution is not fixed to this one.
 
 The following is an abstract description of the various actions that are part of the model. For this moment we are ignoring some specific details (e.g. the protocols used for interactions, the format of the packets etc.), that will be properly explained together with the singular components.
 
@@ -24,14 +24,14 @@ Then, the delivery is ready to start. $D_i$ (the procedure holds for both $D_1$ 
     \item The person in control of $I_j$ collects $G$ and sends a confirmation, using a web interface, to a separate web server.
 \end{itemize}
 
-The model as it is so far cannot be deceived by the dealer, as they have no control over the device; however, it is vulnerable to an attack from a malicious actor controlling $I$. They can, in fact, collect $G$ and not inform the system about the exchange. As a result, we have lost track of who has the good. To solve this, there is the need for a protocol on the ``human'' side. Not complicated, but essential: the dealer has to make sure that who receives $G$ really sends their confirmation to the server. 
+The model as it is so far cannot be deceived by the dealer, as they have no control over the device; however, it is vulnerable to an attack from a malicious actor controlling $I$. They can, in fact, collect $G$ and not inform the system about the exchange. As a result, we have lost track of who has the good. To solve this, there is the need for a protocol on the human side. Not complicated, but essential: the dealer has to make sure that who receives $G$ really sends their confirmation to the server. 
 
 The final recipient, at any time, can access an interface that, by consulting the status of G on the blockchain, informs him about the progress of the delivery. They can check which exchanges happened and whether they succeeded. In case of problems it is immediate to find the responsible. Assuming that the protocol has been fully respected, if $G$ is only confirmed by the dealer it means that it is still in their hands; to the contrary, if only the intermediary confirmed the good, an error must have occurred, because there is no proof that the dealer really arrived at that place.
 
-After this brief analysis there are a lot of unknown elements: how the devices work, how the communications take place, how the data is actually saved. In the next sections we will discuss these aspects, dividing the project into the three main branches that constitute it.
+After this brief analysis there are a lot of unknown elements: how the devices work, how the communications take place, how the data is actually saved. In the next chapters we will discuss these aspects, dividing the project into the three main branches that constitute it.
 
 
-\section{Tracking}
+\chapter{Tracking}
 \label{sec:tracking}
 %Introduction to what kind of tracking is needed, what we expect from the devices. Brief explanation of the state of the art of communication technologies (LoRa, SigFox, LTE, Wi-Fi, BLE, ...) and geolocalization.
 
@@ -39,7 +39,7 @@ The first part that we analyze is the tracking. Our solution needs devices that 
 
 First, we will give a brief description of the modern technologies for the communications of IoT devices, then we will dive into the market to analyze the various options.
 
-\subsection{Communication technologies}
+\section{Communication technologies}
 \label{sec:track_comm}
 %\textit{A brief analysis over the existing tracking technologies}
 
@@ -69,10 +69,10 @@ LTE-M is another LPWAN radio technology standard based on LTE. However, we did n
 %We can conclude that, for our use case, the NB-IoT is the best alternative: despite the higher battery usage, it offers a solid and unrestricted network that can be used without creating a particular infrastructure or having to limit the number of messages.
 
 
-\subsection{The market}
+\section{The market}
 %\textit{The study and testing of the alternatives available, maybe a table summarizing the characteristics of each device (type of communication supported, battery, personalization of firmware, cost).}
 
-The market of the IoT is constantly growing. There are numerous applications for these devices, both indoors and outdoors, with a variety of different requirements. For this reason almost every company offers more than one solution, to best meet the needs of the buyer. We proceed now with the analysis of some candidate trackers. Table \ref{table_devices} summarizes their technical features.
+The market of the IoT is constantly growing. There are numerous applications for these devices, both indoors and outdoors, with a variety of different requirements. For this reason, almost every company offers more than one solution, to best meet the needs of the buyer. We proceed now with the analysis of some candidate trackers. Table \ref{table_devices} summarizes their technical features.
 
 \begin{table}[htbp]
 \centering
@@ -114,7 +114,7 @@ Pycom \cite{pycom} offers hardware products that vary from plug and play devices
 
 This alternative is completely different from the other ones: instead of offering an entire environment, almost ready to use, this device comes completely empty and needs to be programmed. Even the battery is not present, so one can decide which one to use, or directly power it via cable. 
 
-\subsection{The choice}
+\section{The choice}
 \label{sec:track_choice}
 %\textit{Why we decided to choose that device: possibility to fully program the firmware, connectivity...}
 
@@ -122,9 +122,15 @@ Analyzing the various alternatives outlined we opted for the Pycom device. The f
 
 In addition, the FiPy board offers a wide range of communication technologies that we could use: from the simple Wi-Fi for the developing phase to all the mentioned LPWANs. As for the latter, we identified NB-IoT the best technology. Similarly to the previous decision, we made this choice because, despite the higher battery consumption, it offers a solid, reliable and unrestricted network, which can be used without creating a particular infrastructure or having to limit the number of messages.
 
-\subsection{Firmware}
+\section{Firmware}
 \label{sec:track_firmware}
 %\textit{Life cycle of the device (maybe with a flow chart). Some snippets?}
+
+As aforementioned, the chosen device allow us to program its firmware completely. The programming language to be used is MicroPython \cite{micropy}, an implementation of Python 3 optimized for integrate controllers or constrained environments. It includes a subset of Python libraries, together with some modules specific to the MicroPython implementation.
+
+The firmware is composed by two fundamental files: \texttt{boot.py} and \texttt{main.py}. When booting the device they are executed automatically. Usually the first is used to prepare the connectivity and perform the needed preliminary actions, while the second is the algorithm itself.
+
+Figure \ref{flowchart} describes the device's life cycle. After booting, it attaches to the LTE network and initializes the Bluetooth and GPS sensors. Then, it tries to find the coordinates until it succeeds (actually, in the real implementation, a check is added, to handle cases in which it is impossible to locate the tracker; in other words, there is a maximum number of attempts). After the BLE scan, it checks whether the connection is still on: this is necessary because the dealer might have arrived in an area where there is no signal. Successively, it sends the data to the server, or it stores it in an internal file. Clearly, when the file is not empty and there is connection, the device will send the saved packets too. Finally, it turns off for a specific number of seconds, which is configurable.
 
 % block styles
 \tikzstyle{decision} = [diamond, draw, 
@@ -169,20 +175,13 @@ In addition, the FiPy board offers a wide range of communication technologies th
 \label{flowchart}
 \end{figure}
 
-
-As aforementioned, the chosen device allow us to program its firmware completely. The programming language to be used is MicroPython \cite{micropy}, an implementation of Python 3 optimized for integrate controllers or constrained environments. It includes a subset of Python libraries, together with some modules specific to the MicroPython implementation.
-
-The firmware is composed by two fundamental files: \texttt{boot.py} and \texttt{main.py}. When booting the device they are executed automatically. Usually the first is used to prepare the connectivity and perform the needed preliminary actions, while the second is the algorithm itself.
-
-Figure \ref{flowchart} describes the device's life cycle. After booting, it attaches to the LTE network and initializes the Bluetooth and GPS sensors. Then, it tries to find the coordinates until it succeeds (actually, in the real implementation, a check is added, to handle cases in which it is impossible to locate the tracker; in other words, there is a maximum number of attempts). After the BLE scan, it checks whether the connection is still on: this is necessary because the dealer might have arrived in an area where there is no signal. Successively, it sends the data to the server, or it stores it in an internal file. Clearly, when the file is not empty and there is connection, the device will send the saved packets too. Finally, it turns off for a specific number of seconds, which is configurable.
-
-\section{Decentralized architecture}
+\chapter{Decentralized architecture}
 \label{sec:arch}
 %\textit{Requirements of the architecture, same as \ref{sec:tracking} (what we expect etc).}
 
 After the individuation of the IoT devices, the second fundamental part of the project is the architecture. We already introduced in \ref{sec:decentralization} the intention of using a distributed network, possibly implementing a blockchain. However, there are different solutions that make use of this data structure to create a distributed ledger, that need to be analyzed. Unlike the previous sections, however, this time the decision will be more straightforward.
 
-\subsection{Decentralization alternatives}
+\section{Decentralization alternatives}
 \label{sec:alternatives}
 %\textit{Distributed databases, how they reach consensus, permissioned vs permissionless, blockchain based frameworks.}
 There are two main alternatives for a blockchain-based architecture: permissionless and permissioned \cite{consensus_protocols}. In a permissionless blockchain, such as the cryptocurrencies ones, anyone can be a node of network, write in the shared ledger by proposing new transactions (that have to be validated) and participate in the process to reach consensus. In this scenario, the absence of trust is typically mitigated by introducing the ``mining'', a computational expensive process required to validate transactions. The term mining derives from the compensation given to the nodes that manage to approve a block, in form of transactions fees or new coins.
@@ -191,14 +190,14 @@ In contrast, permissioned blockchains are composed by known entities, which can 
 
 In our use case, the choice is simple: we have a precise set of participants that have a common goal, we want to make data available only to the nodes that need it and we do not plan to include a mining process. A permissioned blockchain is absolutely the best solution. Also concerning the framework, we did not consider many alternatives. There is one that perfectly suits our needs: Hyperledger Fabric. 
 
-\subsection{Hyperledger}
+\section{Hyperledger}
 \label{sec:hyperledger}
 %\textit{Why (free and open source, easy to use, easy to install and deploy - mentioning Docker), description of what it is and how it works. Schema of our network using their notation.}
 Hyperledger \cite{hyperledger} is ``an open source collaborative effort created to advance cross-industry blockchain technologies''. In other words, it is a group of related projects and tools, started by the Linux Foundation and supported by many IT companies (such as IBM and Intel), with the goal of offering blockchain-based solutions to build innovative applications. Under the Hyperledger ``umbrella'', there are several frameworks that range from permissionless to permissioned networks, with different targets. In particular, Fabric is the most interesting project for us: it offers a distributed ledger platform designed for industries, with a versatile and highly configurable architecture. It supports even pluggable consensus protocols and identity management protocols, enabling a full customization basing on the use case. Moreover, it is free, easy to use, install and deploy. Every peer of the network runs in Docker containers and the configuration of the network is made significantly simpler by tools like Composer and Explorer.
 
 We have introduced a lot of elements that should be singularly explained. In the following sections we will describe accurately how Hyperledger Fabric works, how it is composed and how we built our network.
 
-\subsection{Hyperledger Fabric structure}
+\section{Hyperledger Fabric structure}
 In this section we will describe the main building blocks of Hyperledger Fabric.
 
 \subsubsection{Assets}
@@ -267,10 +266,10 @@ The documentation of Fabric presents several different implementations to achiev
 \end{itemize}
 %\textit{How Hyperledger ensures consensus, reference to kafka and solo from the docs and the paper} 
 
-\subsection{Hyperledger Composer and Explorer}
-\label{sec:composer}
+\section{Development tools}
+\label{sec:dev_tools}
 \textit{How we used them to build the network}
 
-\section{Interfaces/Servers}
+\chapter{Interfaces/Servers}
 \textit{Small section with a bit of reference about the web servers and how they work. Some snippets can be useful here, explaining how we make use of the HyperLedger APIs. A little paragraph describing what MQTT is and why we decided to use it.}
 
