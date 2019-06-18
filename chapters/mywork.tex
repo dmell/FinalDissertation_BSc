@@ -198,6 +198,7 @@ Hyperledger \cite{hyperledger} is ``an open source collaborative effort created 
 We have introduced a lot of elements that should be singularly explained. In the following sections we will describe accurately how Hyperledger Fabric works, how it is composed and how we built our network.
 
 \section{Hyperledger Fabric structure}
+\label{sec:fabric_structure}
 In this section we will describe the main building blocks of Hyperledger Fabric.
 
 \subsubsection{Assets}
@@ -222,7 +223,7 @@ Focusing now on the ledger itself, it can be described as the list of transactio
 
 The current state is very important because it is the layer directly involved when transactions are submitted. To improve efficiency it is stored in a state database (such as LevelDB or CouchDB), which is basically an indexed view of the transaction log. It can always be regenerated from the chain.
 
-The ledger contains also configuration blocks defining essential information such as access control lists and policies. We will explain better these concepts in \ref{sec:composer}, to report how we used them.
+The ledger contains also configuration blocks defining essential information such as access control lists and policies. We will explain better these concepts in \ref{sec:dev_tools}, to report how we used them.
 
 \subsubsection{Peers}
 Being one of the main reasons for which we chose this framework, the first characteristic of Fabric is that it is private and permissioned. The members of a network, indeed, have to enroll via an MSP (Membership Service Provider). This guarantees a complete control of the infrastructure and the possibility of identifying directly all the participants.
@@ -268,8 +269,44 @@ The documentation of Fabric presents several different implementations to achiev
 
 \section{Development tools}
 \label{sec:dev_tools}
-\textit{How we used them to build the network}
+%\textit{How we used them to build the network}
+For the development phase, Hyperledger offers two powerful tools, that help modelling and testing an architecture before actually deploying it. Composer provides an abstract interface in which it is possible to create networks, while Explorer operates at a lower level and presents the REST APIs to query the blockchain or invoke transactions.
 
+\subsection{Hyperledger Composer}
+When building a new network it is advisable to start from this tool. The interface, called ``playground'', is very immediate and the documentation explains well how to use the various features offered. It is possible to use it directly in a web page, without installing anything, or loading the local version, that requires the development environment already set up. 
+
+To deploy a business network in Composer there are some files that need to be created, in order to define the network properly.
+
+\subsubsection{Model file}
+The model file declares the various components of the network: the resources - namely participants, transactions, assets and events - and the support structures, such as enumerated types and concepts. We did not mention events previously, because they are concepts directly related to Composer; they can be emitted by the tool and subscribed to by external applications. They are triggered when a transaction is committed.
+
+The file is written using an object oriented modeling language. Concretely, the resources are classes with fields that can be of primitive types or references to other classes. For transactions and events, identifiers and timestamps are automatically included. Our \texttt{model.cto} contains the definitions of four participants (the senders, the dealers, the intermediate points and the recipients), two transactions (confirmation from the dealer and confirmation from the intermediate point) and finally one asset (the good exchanged).
+
+\subsubsection{Script file}
+The script file is necessary to define the transaction logic for the business network. The functions created are executed when a transaction is submitted: referencing Section \ref{sec:fabric_structure}, it represents the chaincode.
+
+A processor function is the logical operation related to a transaction defined in the model. It usually modifies one or more values contained in the assets and updates the registry. If required, it can emit an event. Unlike the model file however, the scripts are written in Javascript, a complete and powerful language that offers all its constructs to handle, for example, asynchronous code or external API calls.
+
+In our project \texttt{script.js} simply implements the updates of the state of the asset when confirmations occur. Just a few checks are added to avoid the case of multiple confirmations from the same party and for the same good (which would be useless).
+
+\subsubsection{Access control list}
+This file defines the access control rules for business network. There are two types of access control: for resources and for network administrative changes. The evaluation follows a white list approach: if there is no rule granting a certain access, then it will be denied.
+
+Each rule has to follow a precise grammar: it needs to have a description, a group or a particular participant (reported with the name inside the namespace), an operation (CREATE, READ, UPDATE, DELETE), a target resource (again using the namespace) and an action (ALLOW, DENY). Optionally, there can be conditions and transactions, defining the ones that the participant must have submitted in order to perform the specified operation.
+
+In our network, the access control file (\texttt{permissions.acl}) is quite elaborated: we had to write a rule for participant to allow them to submit their transactions and to see the history of their operations only. Moreover, we denied the possibility of confirming a good from all the entities: even though this is a remote case, we do not want anyone but the participants directly involved to submit transactions about a certain delivery.
+
+\subsubsection{Optional - Queries file}
+This is a file with the purpose of defining some queries to retrieve information from the blockchain world-state. It is an optional component of the business network definition. 
+
+All queries must contain the description and statement properties. The former is a simple string, which can be used to explain in human language the function of the query, the latter is the query itself. The statement is written in an SQL-like query language and can accept runtime parameters. In our project we did not include this file.
+\vspace{11pt}
+
+At this point we have all the elements that qualify a network. The model gives us the structure, the scripts are executed when transactions are submitted and everything is controlled by the access control rules. The missing part is how to actually test a network. Composer provides a test section, to create participants, assets and transitions. Everything is done ``behind the scenes'', by clicking on a graphic interface. On the one hand, this level abstraction is perfect to rapidly test the various files, but on the other there is the need to switch to a more concrete environment and test the real calls. That is why Hyperledger offers Explorer.
+
+\subsection{Hyperledger Explorer}
+
+\newpage
 \chapter{Interfaces/Servers}
 \textit{Small section with a bit of reference about the web servers and how they work. Some snippets can be useful here, explaining how we make use of the HyperLedger APIs. A little paragraph describing what MQTT is and why we decided to use it.}
 
