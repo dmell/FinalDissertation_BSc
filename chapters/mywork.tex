@@ -2,16 +2,9 @@
 \label{cha:main}
 %\textit{Schema of the final solution, explanation of the flow and how it concretely works. Then, focus on three key components.}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.45]{figures/solution.pdf}
-    \caption{The schema of the discussed solution}
-    \label{fig:solution}
-\end{figure}
-
 Figure \ref{fig:solution} illustrates the solution that we have elaborated. Let us explain its characteristics, by first analyzing the overall flow and then concentrating in each step.
 
-The notation used in the schema is the same as the one introduced in Chapter \ref{cha:background}: from left to right, we notice the sender \textit{S}, the good \textit{G}, two dealers $D_1$ and $D_2$, two intermediate points $I_1$ and $I_2$ (each one with a responsible person at work) and finally the receiver $R$. Obviously, this scenario is just a possible combination of entities and the solution is not fixed to this one.
+The notation used in the schema is the same as the one introduced in \ref{sec:statement}: from left to right, we notice the sender \textit{S}, the good \textit{G}, two dealers $D_1$ and $D_2$, two intermediate points $I_1$ and $I_2$ (each one with a responsible person at work) and finally the receiver $R$. Obviously, this scenario is just a possible combination of entities and the solution is not fixed to this one.
 
 The following is an abstract description of the various actions that are part of the model. For this moment we are ignoring some specific details (e.g. the protocols used for interactions, the format of the packets etc.), that will be properly explained together with the singular components.
 
@@ -24,11 +17,19 @@ Then, the delivery is ready to start. $D_i$ (the procedure holds for both $D_1$ 
     \item The person in control of $I_j$ collects $G$ and sends a confirmation, using a web interface, to a separate web server.
 \end{itemize}
 
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.44]{figures/solution.pdf}
+    \caption{The schema of the discussed solution}
+    \label{fig:solution}
+\end{figure}
+% TODO: fix figure deleting orderer node
+
 The model as it is so far cannot be deceived by the dealer, as they have no control over the device; however, it is vulnerable to an attack from a malicious actor controlling $I$. They can, in fact, collect $G$ and not inform the system about the exchange. As a result, we have lost track of who has the good. To solve this, there is the need for a protocol on the human side. Not complicated, but essential: the dealer has to make sure that who receives $G$ really sends their confirmation to the server. 
 
 The final recipient, at any time, can access an interface that, by consulting the status of G on the blockchain, informs him about the progress of the delivery. They can check which exchanges happened and whether they succeeded. In case of problems it is immediate to find the responsible. Assuming that the protocol has been fully respected, if $G$ is only confirmed by the dealer it means that it is still in their hands; to the contrary, if only the intermediary confirmed the good, an error must have occurred, because there is no proof that the dealer really arrived at that place.
 
-After this brief analysis there are a lot of unknown elements: how the devices work, how the communications take place, how the data is actually saved. In the next chapters we will discuss these aspects, dividing the project into the three main branches that constitute it.
+After this brief analysis there are a lot of unknown elements: how the devices work, how the communications take place, how data is actually saved. In the next chapters we will discuss these aspects, dividing the project into the three main branches that constitute it.
 
 
 \chapter{Tracking}
@@ -52,7 +53,7 @@ Many LPWAN technologies have been developed in both the licensed and unlicensed 
 \subsubsection{LoRa}
 LoRa (Long Range) is a patented digital wireless communication technology that was first developed by Cycleo - a French start-up - and then acquired by Semtech (USA). Its ecosystem can be divided in two parts, LoRa and LoRaWAN: the latter is the standard protocol for WAN communications and the former is used as a wide area network technology. In other words, LoRa is the physical layer and LoRaWAN is the MAC and application layer of the stack.
 
-LoRaWAN provides various classes of end devices to address different requirements. It ensures a better battery life compared to the other LPWAN technologies, but this also implies lower data rates and longer latency. To connect to the Internet, LoRa requires a gateway. The infrastructure is the following: end devices communicate with one or more LoRa gateways, which then forward messages to a cloud, a network server or to another gateway. On the contrary, when a message is sent to a device, the network chooses the best gateway.
+LoRaWAN provides various classes of end devices to satisfy different requirements. It ensures a better battery life compared to the other LPWAN technologies, but this also implies lower data rates and longer latency. To connect to the Internet, LoRa requires a gateway. The infrastructure is the following: end devices communicate with one or more LoRa gateways, which then forward messages to a cloud, a network server or to another gateway. On the contrary, when a message is sent to a device, the network chooses the best gateway.
 
 One important aspect of LoRaWAN is determined by the so-called duty-cycle: defined as the maximum percentage of time during which an end-device can occupy a channel, is a key constraint for networks operating in unlicensed bands. Thus, each device has a threshold limiting the overall transmission time. However, the amount of time that a device will need is unknown, since it depends on the distance between the end point and the nearest gateway. The farther the gateway, the longer it will take to deliver a message. As a result, the total amount of messages sent is unknown and totally unpredictable considering our use case, in which we cannot make assumptions on the distribution of the gateways (w.r.t. the location of the tracker).
 
@@ -131,7 +132,6 @@ As aforementioned, the chosen device allow us to program its firmware completely
 The firmware is composed by two fundamental files: \texttt{boot.py} and \texttt{main.py}. When booting the device they are executed automatically. Usually the first is used to prepare the connectivity and perform the needed preliminary actions, while the second is the algorithm itself.
 
 Figure \ref{flowchart} describes the device's life cycle. After booting, it attaches to the LTE network and initializes the Bluetooth and GPS sensors. Then, it tries to find the coordinates until it succeeds (actually, in the real implementation, a check is added, to handle cases in which it is impossible to locate the tracker; in other words, there is a maximum number of attempts). After the BLE scan, it checks whether the connection is still on: this is necessary because the dealer might have arrived in an area where there is no signal. Successively, it sends the data to the server, or it stores it in an internal file. Clearly, when the file is not empty and there is connection, the device will send the saved packets too. Finally, it turns off for a specific number of seconds, which is configurable.
-% TODO: internal file management
 
 % block styles
 \tikzstyle{decision} = [diamond, draw, 
@@ -187,7 +187,7 @@ After the individuation of the IoT devices, the second fundamental part of the p
 %\textit{Distributed databases, how they reach consensus, permissioned vs permissionless, blockchain based frameworks.}
 There are two main alternatives for a blockchain-based architecture: permissionless and permissioned \cite{consensus_protocols}. In a permissionless blockchain, such as the cryptocurrencies ones, anyone can be a node of network, write in the shared ledger by proposing new transactions (that have to be validated) and participate in the process to reach consensus. In this scenario, the absence of trust is typically mitigated by introducing the ``mining'', a computational expensive process required to validate transactions. The term mining derives from the compensation given to the nodes that manage to approve a block, in form of transactions fees or new coins.
 
-In contrast, permissioned blockchains are composed by known entities, which can be members of a consortium or stakeholders in a given business context; different methods are implemented to control and update the state, and there can be particular strategies to limit who can issue transactions. In this case, the risk of a malicious behaviour from a participant is considerably lower, because the guilty can be determined more easily. The possibility of controlling the participants of the network, together with the better performances in terms of latency and throughout, obtained by avoiding computational intensive consensus, render this type of blockchain more attractive for large corporations.
+In contrast, permissioned blockchains are composed by known entities, which can be members of a consortium or stakeholders in a given business context; different methods are implemented to control and update the state, and there can be particular strategies to limit who can issue transactions. In this case, the risk of a malicious behaviour from a participant is considerably lower, because the guilty can be determined more easily. The possibility of controlling the participants of the network, together with the better performances in terms of latency and throughput, obtained by avoiding computational intensive consensus, render this type of blockchain more attractive for large corporations.
 % TODO: check consistency of verbs about decisions (past/present)
 
 In our use case, the choice is simple: we have a precise set of participants that have a common goal, we want to make data available only to the nodes that need it and we do not plan to include a mining process. A permissioned blockchain is absolutely the best solution. Also concerning the framework, we did not consider many alternatives. There is one that perfectly suits our needs: Hyperledger Fabric. 
@@ -201,12 +201,12 @@ We have introduced a lot of elements that should be singularly explained. In the
 
 \section{Hyperledger Fabric structure}
 \label{sec:fabric_structure}
-In this section we will describe the main building blocks of Hyperledger Fabric.
+In this section we report and explain the main building blocks of Hyperledger Fabric.
 
 \subsubsection{Assets}
 Assets are the virtual coins exchanged in the Fabric environment. They can represent anything for which transactions are made. More specifically, they can be real products, like cars or houses, or intangible goods, like intellectual properties.
 
-Concretely, assets are represented in the system as collections of key-value pairs, usually in JSON dictionaries. Every update of the assets is saved in the ledger.
+Concretely, assets are represented in the system as collections of key-value pairs, stored in JSON dictionaries. Every update of the assets is saved in the ledger.
 
 In our system, as outlined previously, the assets are the goods being delivered. Their state is altered during the exchanges, through the submission of transactions, but the final recipient is always able to check every modification occurred.
 
@@ -214,7 +214,7 @@ In our system, as outlined previously, the assets are the goods being delivered.
 % in ETH transazioni scatenano contratti
 % ETH non è una crypto, è blockchain
 % fare capire che è un programma, Turing complete bla bla
-Smart contracts are another concept related to a blockchain network: in general, they are self-executing scripts that are triggered by some conditions. For example Ethereum, another popular permissionless blockchain \cite{ethereum}, allows developers to program their ``autonomous agents'', using a particular DSL (Domain Specific Language), Solidity. This language is Turing-complete, so the smart contracts are concretely real programs, that can perform a wide range of actions. They can be used, for instance, so that funds are spent only when all the members of an organization (or a fixed percentage of them) give their authorization. 
+Smart contracts are another concept related to a blockchain network: in general, they are self-executing scripts that are triggered by some conditions. For example, Ethereum - another popular permissionless blockchain \cite{ethereum} - allows developers to program their ``autonomous agents'', using a particular DSL (Domain Specific Language), Solidity. This language is Turing-complete, so the smart contracts are concretely real programs, that can perform a wide range of actions. They can be used, for instance, so that funds are spent only when all the members of an organization (or a fixed percentage of them) give their authorization. 
 
 In the Hyperledger environment, a smart contract defines the business logic that controls the lifecycle of the assets. It is also called ``chaincode'', interchangeably, even though the former is the transaction logic itself, while the latter is the container of a group of contracts which is then deployed in the network. 
 
@@ -223,7 +223,7 @@ In our use case, smart contracts are used to manipulate the state of the goods. 
 \subsubsection{Ledger}
 Focusing now on the ledger itself, it can be described as the list of transactions maintained by each member of the network. It is composed by two parts. First, the ``chain'', which is the log of all transactions that have been made, kept in the tamper-resistant blockchain with all the properties outlined in \ref{sec:decentralization}. Second, the ``world state'', representing the latest values for all the keys. 
 
-The current state is very important because it is the layer directly involved when transactions are submitted. To improve efficiency it is stored in a state database (such as LevelDB or CouchDB), which is basically an indexed view of the transaction log. It can always be regenerated from the chain.
+The current state is very important because it is the layer directly involved when transactions are submitted. To improve efficiency, it is stored in a state database (such as LevelDB or CouchDB), which is basically an indexed view of the transaction log. It can always be regenerated from the chain.
 
 The ledger contains also configuration blocks defining essential information such as access control lists and policies. We will explain better these concepts in \ref{sec:dev_tools}, to report how we used them.
 
@@ -250,8 +250,8 @@ We can summarize the typical Fabric workflow in six steps. Here we consider a co
     \item A general node invokes a transaction request. This can be done through a client application.
     \item The general peer broadcasts the proposal to the required set of endorsing peers. How they are chosen depends on the endorsement policy defined for a chaincode, but intuitively it will be composed by the endorsing peers of each organization involved in that transaction proposal.
     \item Each of them checks the details needed to validate the transaction and runs the chaincode, independently. After that, they generate a response, containing the approval or the rejection of the proposal. 
-    \item After receiving the needed number of positive responses, the peer sends the approved transaction to an orderer, to ensure that it is included in the ledger.
-    \item Ordering nodes receive transactions from many different application clients concurrently. Their task is to work together to collectively form the ordering service, arranging batches of submitted transactions into a well-defined sequence and package them into blocks. After this, they have to forward the new block to the anchor nodes.
+    \item After receiving the needed number of positive responses, the peer sends the approved transaction to an orderer, to include it in the ledger.
+    \item Ordering nodes receive transactions from many different application clients concurrently. Their task is to work together to collectively form the ordering service, arranging batches of submitted transactions into a well-defined sequence and packaging them into blocks. After this, they have to forward the new block to the anchor nodes.
     \item Anchor nodes finally forward the block to the other peers inside their own organization. These individual peers then update their local ledger.
 \end{enumerate}
 
@@ -266,13 +266,13 @@ Consensus algorithms also enable the nodes of a network to survive the failures 
 Fabric presents three different built-in implementations of protocols to achieve consensus in ordering service nodes.
 \begin{itemize}
     \item Solo, as the name suggests, features only one orderer node. Obviously, it is not fault tolerant, as it presents a centralized and vulnerable element. It cannot be a valid approach in production, but it can be useful when testing the architecture, because, from the other elements perspective, transactions are processed in the same way as with more complicated protocols. 
-    \item Raft \cite{raft} is a CFT protocol that has been introduced in v1.4.1. The underlying model includes a dynamically elected node which acts as a leader, that receives all the updates, elaborates them and distributes its decisions among the others. In short, Raft nodes can be in three states: leader, candidate or follower. To elect a leader, the nodes set a random timer and candidate themselves when the timer is up. The candidate then broadcasts the ``vote request'' messages and when the majority of the other nodes respond the leader is elected. To keep the configuration, Raft uses an heartbeat protocol and another timeout, that triggers a new leader election in case of faults.
-    \item Kafka \cite{kafka} is another CFT protocol that has been adapted for use as a ordering service in Fabric. Its logic is conceptually similar to the one used by Raft. However, the management, coordination and control of the cluster is handler by a Zookeeper ensamble, which is particularly complicated to set up: this is the reason for which Raft has been introduced by the Fabric designers.
+    \item Raft \cite{raft} is a CFT protocol that has been introduced in v1.4.1. The underlying model includes a dynamically elected node which acts as a leader, that receives all the updates, elaborates them and distributes its decisions among the others. In short, Raft nodes can be in three states: leader, candidate or follower. To elect a leader, the nodes set a random timer and candidate themselves when the timer is up. The candidate then broadcasts ``vote request'' messages and when the majority of the other nodes respond the leader is elected. To keep the configuration, Raft uses an heartbeat protocol and another timeout, that triggers a new leader election in case of faults.
+    \item Kafka \cite{kafka} is another CFT protocol that has been adapted for use as an ordering service in Fabric. Its logic is conceptually similar to the one used by Raft. However, the management, coordination and control of the cluster is handled by a Zookeeper ensamble, which is particularly complicated to set up: this is the reason for which Raft has been introduced by the Fabric designers.
 \end{itemize}
 
-It is worth noting that no BFT (Byzantine Fault Tolerant) protocols are currently available, so the system is not capable of reaching agreement in the case of malicious nodes. However, as mentioned in the previous section, Fabric supports pluggable consensus: this means that a developer can include a different ordering service to manage the blockchain. An example of BFT ordering service that has been implemented for this framework is reported in \cite{bft_fabric}. This protocol is based on the BFT-SMART state machine replication/consensus library, with some optimizations to make it process up to ten thousand transactions per second, even with peers located at large distances. 
+It is worth noting that no BFT protocols are currently available, so the system is not capable of reaching agreement in the case of malicious nodes. However, as mentioned in the previous section, Fabric supports pluggable consensus: this means that a developer can include a different ordering service to manage the blockchain. An example of BFT ordering service that has been implemented for this framework is reported in \cite{bft_fabric}. This protocol is based on the BFT-SMART state machine replication/consensus library, with some optimizations to make it process up to ten thousand transactions per second, even with peers located at large distances. 
 
-Why Hyperledger does not offer by default a BFT ordering service is understandable: as mentioned above, permissioned blockchains have a higher level of trust between entities compared to permissionless ones. The participants are known to each other and all actions carry a signature of the organization submitting them. 
+Why Hyperledger does not offer by default a BFT ordering service is understandable: as mentioned above, permissioned blockchains have a higher level of trust between their  entities compared to permissionless ones. Participants are known to each other and all actions carry a signature of the organization submitting them, thus the designers preferred developing CFT only protocols. 
 
 \section{Development tools}
 \label{sec:dev_tools}
@@ -280,7 +280,7 @@ Why Hyperledger does not offer by default a BFT ordering service is understandab
 For the development phase, Hyperledger offers some powerful tools, that help modelling and testing an architecture before actually deploying it. In our project we used two of them. Composer enables modelling of business networks and its resources; it makes easier the generation of a REST API and a UI application that allows for quick integration within an existing system. Explorer, instead, operates at a lower level and presents a dashboard with an overview of the calls available to query the blockchain or invoke transactions.
 
 \subsection{Hyperledger Composer}
-When building a new network it is advisable to start from this tool. The interface, called ``playground'', is very immediate and the documentation explains well how to use the various features offered. It is possible to use it directly in a web page, without installing anything, or loading the local version, that requires the development environment already set up. 
+When building a new network it is advisable to start from this tool. The interface, called ``playground'', is very immediate and the documentation explains well how to use the various features offered. It is possible to access it directly from a web page, without installing anything, or loading the local version, that requires the development environment already set up. 
 
 To deploy a business network in Composer there are some files that need to be created, in order to define the network properly.
 
@@ -294,7 +294,7 @@ The script file is necessary to define the transaction logic for the business ne
 
 A processor function is the logical operation related to a transaction defined in the model. It usually modifies one or more values contained in the assets and updates the registry. If required, it can emit an event. Unlike the model file however, the scripts are written in Javascript, a complete and powerful language that offers all its constructs to handle, for example, asynchronous code or external API calls.
 
-In our project \texttt{script.js} simply implements the updates of the state of the asset when confirmations occur. Just a few checks are added to avoid the case of multiple confirmations from the same party and for the same good (which would be useless).
+In our project, \texttt{script.js} simply implements the updates of the state of the asset when confirmations occur. Just a few checks are added to avoid the case of multiple confirmations from the same party and for the same good (which would be useless).
 
 \subsubsection{Access control list}
 This file defines the access control rules for business network. There are two types of access control: for resources and for network administrative changes. The evaluation follows a white list approach: if there is no rule granting a certain access, then it will be denied.
@@ -320,7 +320,7 @@ In parallel, it is also possible to connect to the REST server and test the vari
 
 This tool is very helpful to integrate these calls in already existing servers. It is enough to check the APIs, format the requests and use them from another program. In the next chapter we will notice how immediate this has been.
 
-\newpage
+
 \chapter{Servers and Interfaces}
 \label{cha:servers}
 %\textit{Small section with a bit of reference about the web servers and how they work. Some snippets can be useful here, explaining how we make use of the HyperLedger APIs. A little paragraph describing what MQTT is and why we decided to use it.}
@@ -359,7 +359,7 @@ In our project, the server is the broker itself, while the devices are the publi
 \subsection{Messages management}
 Obviously, messages cannot contain any information about the goods being delivered. In fact, the IoT trackers do not have access to this data and can only send updates with the location and the nearby beacons. Consequently, a lot of messages are generated, but only a few of them need to be forwarded to the blockchain.
 
-The server needs to periodically query the blockchain to retrieve the list of goods to be delivered by its organization. Then, ideally, there should be a re-ordering phase of these deliveries, integrated with the company's internal management system, to assign each one to a single dealer. In this way, the server should have a unequivocal list of who will deliver what. Let us make this clear with an example.
+The server needs to periodically query the ledger to retrieve the list of goods to be delivered by its organization. Then, ideally, there should be a re-ordering phase of these deliveries, integrated with the company's internal management system, to assign each one to a single dealer. In this way, the server should have a unequivocal list of who will deliver what. Let us make this clear with an example.
 
 The company $X$ is a logistic company, its fleet is composed by four vehicles ($X_1, X_2, X_3, X_4$) and each one is equipped with the IoT tracker. $X$ is registered as organization in our blockchain network. One day it queries the blockchain and it discovers that it has been chosen to take care of a delivery from the intermediate points $A$ and $B$. $X$ should already know $B$, in particular, the identifier of its beacon; if not, it can retrieve this data from the blockchain. Then, the company chooses one specific dealer, driving one specific vehicle, that will perform the delivery. In an internal register, the server should keep track that the vehicle $X_i$, carrying the device identified as $i$, is delivering a certain good to the intermediate point $B$, whose beacon identifier is $b$. When the dealer arrives at $B$, the tracker will detect the beacon and send an MQTT message containing $b$, at the topic \texttt{/i}. At that point, the server has to check that the beacon identifier corresponds to the one saved in the internal database and, if so, submit to the blockchain a transaction in which it confirms the delivery from the dealer. This complicated infrastructure is necessary because we want to avoid the case, although remote, of another dealer $X_j$ ``accidentally'' sending a confirmation, without actually being the one assigned for the delivery.
 
