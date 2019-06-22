@@ -19,11 +19,10 @@ Then, the delivery is ready to start. $D_i$ (the procedure holds for both $D_1$ 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[scale=0.44]{figures/solution.pdf}
+    \includegraphics[width=\textwidth]{figures/solution.pdf}
     \caption{The schema of the discussed solution}
     \label{fig:solution}
 \end{figure}
-% TODO: fix figure deleting orderer node
 
 The model as it is so far cannot be deceived by the dealer, as they have no control over the device; however, it is vulnerable to an attack from a malicious actor controlling $I$. They can, in fact, collect $G$ and not inform the system about the exchange. As a result, we have lost track of who has the good. To solve this, there is the need for a protocol on the human side. Not complicated, but essential: the dealer has to make sure that who receives $G$ really sends their confirmation to the server. 
 
