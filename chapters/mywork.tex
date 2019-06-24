@@ -2,9 +2,9 @@
 \label{cha:main}
 %\textit{Schema of the final solution, explanation of the flow and how it concretely works. Then, focus on three key components.}
 
-Figure \ref{fig:solution} illustrates the solution that we have elaborated. Let us explain its characteristics, by first analyzing the overall flow and then concentrating in each step.
+Figure \ref{fig:solution} illustrates the solution that we have designed. Let us explain its characteristics, by first analyzing the overall flow and then concentrating on each step.
 
-The notation used in the schema is the same as the one introduced in \ref{sec:statement}: from left to right, we notice the sender \textit{S}, the good \textit{G}, two dealers $D_1$ and $D_2$, two intermediate points $I_1$ and $I_2$ (each one with a responsible person at work) and finally the receiver $R$. Obviously, this scenario is just a possible combination of entities and the solution is not fixed to this one.
+The notation used in the schema is the same as the one introduced in Section \ref{sec:statement}: from left to right, we notice the sender \textit{S}, the good \textit{G}, two dealers $D_1$ and $D_2$, two intermediate points $I_1$ and $I_2$ (each one with a responsible person at work) and finally the receiver $R$. Obviously, this scenario is just a possible combination of entities and the solution is not fixed to this one.
 
 The following is an abstract description of the various actions that are part of the model. For this moment we are ignoring some specific details (e.g. the protocols used for interactions, the format of the packets etc.), that will be properly explained together with the singular components.
 
@@ -26,7 +26,7 @@ Then, the delivery is ready to start. $D_i$ (the procedure holds for both $D_1$ 
 
 The model as it is so far cannot be deceived by the dealer, as they have no control over the device; however, it is vulnerable to an attack from a malicious actor controlling $I$. They can, in fact, collect $G$ and not inform the system about the exchange. As a result, we have lost track of who has the good. To solve this, there is the need for a protocol on the human side. Not complicated, but essential: the dealer has to make sure that who receives $G$ really sends their confirmation to the server. 
 
-The final recipient, at any time, can access an interface that, by consulting the status of G on the blockchain, informs him about the progress of the delivery. They can check which exchanges happened and whether they succeeded. In case of problems it is immediate to find the responsible. Assuming that the protocol has been fully respected, if $G$ is only confirmed by the dealer it means that it is still in their hands; to the contrary, if only the intermediary confirmed the good, an error must have occurred, because there is no proof that the dealer really arrived at that place.
+The final recipient, at any time, can access an interface that, by consulting the status of G on the blockchain, informs him about the progress of the delivery. They can check which exchanges happened and whether they succeeded. In case of problems it is immediate to find the responsible. Assuming that the protocol has been fully respected, if $G$ is only confirmed by the dealer, it means that it is still in their hands; to the contrary, if only the intermediary confirmed the good, an error must have occurred, because there is no proof that the dealer really arrived at that place.
 
 After this brief analysis there are a lot of unknown elements: how the devices work, how the communications take place, how data is actually saved. In the next chapters we will discuss these aspects, dividing the project into the three main branches that constitute it.
 
@@ -120,13 +120,13 @@ This alternative is completely different from the other ones: instead of offerin
 
 Analyzing the various alternatives outlined we opted for the Pycom device. The first reason is the possibility of fully programming the firmware, which guarantees a high level of flexibility. Indeed, we need a complete control on the device: the algorithm needs to be elaborated and written by us. With all the other solutions, this would not possible; building our service on top of another one was not ideal.
 
-In addition, the FiPy board offers a wide range of communication technologies that we could use: from the simple Wi-Fi for the developing phase to all the mentioned LPWANs. As for the latter, we identified NB-IoT the best technology. Similarly to the previous decision, we made this choice because, despite the higher battery consumption, it offers a solid, reliable and unrestricted network, which can be used without creating a particular infrastructure or having to limit the number of messages.
+In addition, the FiPy board offers a wide range of communication technologies that we could use: from the simple Wi-Fi for the developing phase to all the mentioned LPWANs. As for the latter, we identified NB-IoT as the best technology. Similarly to the previous decision, we made this choice because, despite the higher battery consumption, it offers a solid, reliable and unrestricted network, which can be used without creating a particular infrastructure or having to limit the number of messages.
 
 \section{Firmware}
 \label{sec:track_firmware}
 %\textit{Life cycle of the device (maybe with a flow chart). Some snippets?}
 
-As aforementioned, the chosen device allow us to program its firmware completely. The programming language to be used is MicroPython \cite{micropy}, an implementation of Python 3 optimized for integrate controllers or constrained environments. It includes a subset of Python libraries, together with some modules specific to the MicroPython implementation.
+As mentioned before, the chosen device allow us to program its firmware completely. The programming language to be used is MicroPython \cite{micropy}, an implementation of Python 3 optimized for integrate controllers or constrained environments. It includes a subset of Python libraries, together with some modules specific to the MicroPython implementation.
 
 The firmware is composed by two fundamental files: \texttt{boot.py} and \texttt{main.py}. When booting the device they are executed automatically. Usually the first is used to prepare the connectivity and perform the needed preliminary actions, while the second is the algorithm itself.
 
@@ -175,6 +175,8 @@ Figure \ref{flowchart} describes the device's life cycle. After booting, it atta
 \label{flowchart}
 \end{figure}
 
+\textit{Questa sezione deve essere espansa con maggiori dettagli su quello che ho fatto io}
+
 \chapter{Decentralized architecture}
 \label{sec:arch}
 %\textit{Requirements of the architecture, same as \ref{sec:tracking} (what we expect etc).}
@@ -184,9 +186,9 @@ After the individuation of the IoT devices, the second fundamental part of the p
 \section{Decentralization alternatives}
 \label{sec:alternatives}
 %\textit{Distributed databases, how they reach consensus, permissioned vs permissionless, blockchain based frameworks.}
-There are two main alternatives for a blockchain-based architecture: permissionless and permissioned \cite{consensus_protocols}. In a permissionless blockchain, such as the cryptocurrencies ones, anyone can be a node of network, write in the shared ledger by proposing new transactions (that have to be validated) and participate in the process to reach consensus. In this scenario, the absence of trust is typically mitigated by introducing the ``mining'', a computational expensive process required to validate transactions. The term mining derives from the compensation given to the nodes that manage to approve a block, in form of transactions fees or new coins.
+There are two main alternatives for a blockchain-based architecture: permissionless and permissioned \cite{consensus_protocols}. In a permissionless blockchain, such as the cryptocurrency ones, anyone can be a node of network, write in the shared ledger by proposing new transactions (that have to be validated) and participate in the process to reach consensus. In this scenario, the absence of trust is typically mitigated by introducing the concept of ``mining'', a computational expensive process required to validate transactions. The term mining derives from the compensation given to the nodes that manage to approve a block, in form of transactions fees or new coins.
 
-In contrast, permissioned blockchains are composed by known entities, which can be members of a consortium or stakeholders in a given business context; different methods are implemented to control and update the state, and there can be particular strategies to limit who can issue transactions. In this case, the risk of a malicious behaviour from a participant is considerably lower, because the guilty can be determined more easily. The possibility of controlling the participants of the network, together with the better performances in terms of latency and throughput, obtained by avoiding computational intensive consensus, render this type of blockchain more attractive for large corporations.
+In contrast, permissioned blockchains are composed by known entities, which can be members of a consortium or stakeholders in a given business context; different methods are implemented to control and update the state, and there can be particular strategies to limit who can issue transactions. In this case, the risk of a malicious behaviour from a participant is considerably lower, because the guilty can be identified more easily. The possibility of controlling the participants of the network, together with the better performances in terms of latency and throughput, obtained by avoiding computational intensive consensus, render this type of blockchain more attractive for large corporations.
 % TODO: check consistency of verbs about decisions (past/present)
 
 In our use case, the choice is simple: we have a precise set of participants that have a common goal, we want to make data available only to the nodes that need it and we do not plan to include a mining process. A permissioned blockchain is absolutely the best solution. Also concerning the framework, we did not consider many alternatives. There is one that perfectly suits our needs: Hyperledger Fabric. 
@@ -196,7 +198,7 @@ In our use case, the choice is simple: we have a precise set of participants tha
 %\textit{Why (free and open source, easy to use, easy to install and deploy - mentioning Docker), description of what it is and how it works. Schema of our network using their notation.}
 Hyperledger \cite{hyperledger} is ``an open source collaborative effort created to advance cross-industry blockchain technologies''. In other words, it is a group of related projects and tools, started by the Linux Foundation and supported by many IT companies (such as IBM and Intel), with the goal of offering blockchain-based solutions to build innovative applications. Under the Hyperledger ``umbrella'', there are several frameworks that range from permissionless to permissioned networks, with different targets. In particular, Fabric is the most interesting project for us: it offers a distributed ledger platform designed for industries, with a versatile and highly configurable architecture. It supports even pluggable consensus protocols and identity management protocols, enabling a full extensibility basing on the use case. Moreover, it is free, easy to use, install and deploy. Every peer of the network runs in Docker containers and the configuration of the network is made significantly simpler by tools like Composer and Explorer.
 
-We have introduced a lot of elements that should be singularly explained. In the following sections we will describe accurately how Hyperledger Fabric works, how it is composed and how we built our network.
+We have introduced a lot of elements that need to be explained in details. In the following sections we will describe accurately how Hyperledger Fabric works, how it is composed and how we built our network.
 
 \section{Hyperledger Fabric structure}
 \label{sec:fabric_structure}
@@ -224,7 +226,7 @@ Focusing now on the ledger itself, it can be described as the list of transactio
 
 The current state is very important because it is the layer directly involved when transactions are submitted. To improve efficiency, it is stored in a state database (such as LevelDB or CouchDB), which is basically an indexed view of the transaction log. It can always be regenerated from the chain.
 
-The ledger contains also configuration blocks defining essential information such as access control lists and policies. We will explain better these concepts in \ref{sec:dev_tools}, to report how we used them.
+The ledger contains also configuration blocks defining essential information such as access control lists and policies. We will explain better these concepts in Section \ref{sec:dev_tools}, to report how we used them.
 
 \subsubsection{Peers}
 Being one of the main reasons for which we chose this framework, the first characteristic of Fabric is that it is private and permissioned. The members of a network, indeed, have to enroll via an MSP (Membership Service Provider). This guarantees a complete control of the infrastructure and the possibility of identifying directly all the participants.
@@ -240,7 +242,7 @@ More precisely, each organization is responsible for setting up their peers. Eac
 
 It can be pointed out that an orderer peer is potentially a single point of failure, thus exposing a Fabric network to the same problems of a traditional centralized architecture. If there is only one orderer node, this is true, but a real solution (in production) should consider this issue and avoid it. This point will be better clarified in the consensus section.
 
-In our project, it is reasonable to have a single peer per organization acting as orderer and endorser. Unlike other cases, in which the network requires a higher number of endorsing peers, because many transactions are not valid, in our project the interactions are more controlled (by design of the servers, see Chapter \ref{cha:servers}) and a balanced approach is a good one. This has the advantage of reducing overhead, because both operations are unified in the same peer, but at the same time it requires special protection for those nodes, since they are essential for the organizations. General and anchor peers can be deployed basing on the requirements of the entities: if the number of interactions is particularly high they can consider adding more general peers, to improve load balancing and availability of the service; on the contrary, if an organization does not have these specific requirements it can concentrate everything in one node, representing the anchor and general peer.
+In our project, it is reasonable to have a single peer per organization acting as orderer and endorser. Unlike other cases, in which the network requires a higher number of endorsing peers, because many transactions are not valid, in our project the interactions are more controlled (by design of the servers, see Chapter \ref{cha:servers}) and a balanced approach is a good one. This has the advantage of reducing overhead, because both operations are unified in the same peer, but at the same time it requires special protection for those nodes, since they are essential for the organizations. General and anchor peers can be deployed based on the requirements of the entities: if the number of interactions is particularly high, they can consider adding more general peers, to improve load balancing and availability of the service; on the contrary, if an organization does not have these specific requirements it can concentrate everything in one node, representing the anchor and general peer.
 
 \subsubsection{Transactions}
 We can summarize the typical Fabric workflow in six steps. Here we consider a complete network with all the types of peers deployed separately.
