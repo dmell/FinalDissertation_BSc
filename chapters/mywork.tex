@@ -208,7 +208,7 @@ We have introduced a lot of elements that need to be explained in details. In th
 
 \section{Hyperledger Fabric structure}
 \label{sec:fabric_structure}
-In this section we report and explain the main building blocks of Hyperledger Fabric.
+In this section we report and explain the main building blocks of Hyperledger Fabric \cite{hyperledger_paper}.
 
 \subsubsection{Assets}
 Assets are the virtual coins exchanged in the Fabric environment. They can represent anything for which transactions are made. More specifically, they can be real products, like cars or houses, or intangible goods, like intellectual properties.
@@ -250,6 +250,14 @@ It can be pointed out that an orderer peer is potentially a single point of fail
 
 In our project, it is reasonable to have a single peer per organization acting as orderer and endorser. Unlike other cases, in which the network requires a higher number of endorsing peers, because many transactions are not valid, in our project the interactions are more controlled (by design of the servers, see Chapter~\ref{cha:servers}) and a balanced approach is a good one. This has the advantage of reducing overhead, because both operations are unified in the same peer, but at the same time it requires special protection for those nodes, since they are essential for the organizations. General and anchor peers can be deployed based on the requirements of the entities: if the number of interactions is particularly high, they can consider adding more general peers, to improve load balancing and availability of the service; on the contrary, if an organization does not have these specific requirements it can concentrate everything in one node, representing the anchor and general peer.
 
+\subsubsection{Channels}
+A channel can be simply defined as a virtual tunnel by which the members can connect with each other. Inside a single Fabric network, organizations can have multiple channels, regulated by specific policies. Peers need to authenticate to participate (via the Membership Service Provider) and there have to be an ordering service implemented to guarantee the functioning of the subnet. Each channel has its own ledger, thus communications are made private within the participants.
+
+This is the main reason for which channels are important. In fact, they provide privacy not only between channels, but also towards the whole network. In this way, organizations can decide what they want to share with all the members and what they want to keep private between a subset of them.
+Even though this mechanism might seem contradictory, it is evident that different groups within the network will have a need for different information processes to be shared. Channels provide an efficient and reliable way to satisfy such requirement.
+
+In our skeleton solution we did not include channels. However, they can be appropriate if, for example, the intermediate points are competing with each other, hence they do not want each delivery to be visible publicly. In this case, an ad hoc channel could be created and the various organizations involved would be the participants.
+
 \subsubsection{Transactions}
 We can summarize the typical Fabric workflow in six steps. Here we consider a complete network with all the types of peers deployed separately.
 
@@ -287,6 +295,7 @@ Why Hyperledger does not offer by default a BFT ordering service is understandab
 For the development phase, Hyperledger offers some powerful tools, that help modelling and testing an architecture before actually deploying it. In our project we used two of them. Composer enables modelling of business networks and its resources; it makes easier the generation of a REST API and a UI application that allows for quick integration within an existing system. Explorer, instead, operates at a lower level and presents a dashboard with an overview of the calls available to query the blockchain or invoke transactions.
 
 \subsection{Hyperledger Composer}
+\label{sec:composer}
 When building a new network it is advisable to start from this tool. The interface, called ``playground'', is very immediate and the documentation explains well how to use the various features offered. It is possible to access it directly from a web page, without installing anything, or loading the local version, that requires the development environment already set up. 
 
 To deploy a business network in Composer there are some files that need to be created, in order to define the network properly.
@@ -326,8 +335,6 @@ Developers can check information like name, state and list of network nodes, det
 In parallel, it is also possible to connect to the REST server and test the various actions available. There are some standard operations offered by default: e.g., for every resource, it is possible to use a \texttt{GET} request to retrieve the JSON objects of all the entities, or of a specific one by including its identifier. Also \texttt{POST} requests are offered, to add new instances. In addition to these, all the user defined queries are reported in the interface as well.
 
 This tool is very helpful to integrate these calls in already existing servers. It is enough to check the APIs, format the requests and use them from another program. In the next chapter we notice how immediate this has been.
-
-\newpage
 
 
 \chapter{Servers and Interfaces}
