@@ -133,8 +133,7 @@ In addition, the FiPy board offers a wide range of communication technologies th
 \tikzstyle{block} = [rectangle, draw,
     text width=5em, text centered, minimum height=4em]
 \tikzstyle{line} = [draw, -latex']
-\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
-    minimum height=2em]
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm, minimum height=2em]
     
 \begin{figure}[htb]
 \begin{tikzpicture}[node distance = 3cm, auto]
@@ -259,7 +258,15 @@ Even though this mechanism might seem contradictory, it is evident that differen
 In our skeleton solution we did not include channels. However, they can be appropriate if, for example, the intermediate points are competing with each other, hence they do not want each delivery to be visible publicly. In this case, an ad hoc channel could be created and the various organizations involved would be the participants.
 
 \subsubsection{Transactions}
-We can summarize the typical Fabric workflow in six steps. Here we consider a complete network with all the types of peers deployed separately.
+We can summarize the typical Fabric workflow in six steps. Here we consider a complete network with all the types of peers deployed separately. Figure \ref{fig:trans_flow} illustrates the protocol graphically.
+
+\begin{figure}[htb]
+ \centering{
+ \resizebox{0.85\textwidth}{!}{\input{figures/transactionflow.tex}}
+ \caption{Schema of the transaction flow. For the sake of readability, anchor nodes have not been included, so the ledger is directly sent to the general peers.}
+ \label{fig:trans_flow}
+ }
+\end{figure}
 
 \begin{enumerate}
     \item A general node invokes a transaction request. This can be done through a client application.
