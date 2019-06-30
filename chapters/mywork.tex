@@ -23,6 +23,7 @@ Then, the delivery is ready to start. $D_i$ (the procedure holds for both $D_1$ 
     \caption{The schema of the discussed solution}
     \label{fig:solution}
 \end{figure}
+% TODO: aggiustare la figura guardando il foglio stampato. Modificare font
 
 The model as it is so far cannot be deceived by the dealer, as they have no control over the device; however, it is vulnerable to an attack from a malicious actor controlling $I$. They can, in fact, collect $G$ and not inform the system about the exchange. As a result, we have lost track of who has the good. To solve this, there is the need for a protocol on the human side. Not complicated, but essential: the dealer has to make sure that who receives $G$ really sends their confirmation to the server. 
 
@@ -211,6 +212,8 @@ Hyperledger~\cite{hyperledger} is ``an open source collaborative effort created 
 
 We have introduced a lot of elements that need to be explained in details. In the following sections we describe accurately how Hyperledger Fabric works, how it is composed and how we built our network.
 
+% TODO: What is Docker, how a Fabric network works, how to integrate peers with other applications
+
 \section{Hyperledger Fabric structure}
 \label{sec:fabric_structure}
 In this section we report and explain the main building blocks of Hyperledger Fabric \cite{hyperledger_paper}.
@@ -300,7 +303,7 @@ Fabric presents three different built-in implementations of protocols to achieve
 
 It is worth noting that no BFT protocols are currently available, so the system is not capable of reaching agreement in the case of malicious nodes. However, as mentioned in the previous section, Fabric supports pluggable consensus: this means that a developer can include a different ordering service to manage the blockchain. Sousa et al.\ implemented a BFT ordering service for this framework~\cite{bft_fabric}. This protocol is based on the BFT-SMART state machine replication/consensus library, with some optimizations to make it process up to ten thousand transactions per second, even with peers located at large distances. 
 
-Why Hyperledger does not offer by default a BFT ordering service is understandable: as mentioned above, permissioned blockchains have a higher level of trust between their  entities compared to permissionless ones. Participants are known to each other and all actions carry a signature of the organization submitting them, thus the designers preferred developing CFT only protocols. 
+Why Hyperledger does not offer by default a BFT ordering service is understandable: as mentioned above, permissioned blockchains have a higher level of trust between their  entities compared to permissionless ones. Participants are known to each other and all actions carry a signature of the organization submitting them, thus the designers preferred developing CFT-only protocols. 
 
 \section{Development tools}
 \label{sec:dev_tools}
@@ -396,7 +399,11 @@ The company $X$ is a logistic company, its fleet is composed by four vehicles ($
 \section{Intermediate point server}
 This type of server is the other one directly involved in exchanges. The manager of the intermediate point should authenticate in the system and fill a form to confirm the reception of a certain good. In particular, this server has an internal database (we used MongoDB, but there are many alternatives) to keep the credentials of the users: in fact, there can be different employees working in shifts. 
 
-Practically, after logging in, the user can insert the identifier of a good (we assumed that it is directly readable from the product itself, maybe on a sticker); then, the server generates a transaction towards the blockchain to confirm that delivery. Clearly, if the identifier does not exist, the transaction will not be approved and an error message will be returned. It is important that the dealer controls the correctness of this action, to defend themselves from a malicious employee at the exchange point. However, Fabric transactions are approved quickly enough to make this process smooth. 
+Practically, after logging in, the user can insert the identifier of a good (we assumed that it is directly readable from the product itself, maybe on a sticker); then, the server generates a transaction towards the blockchain to confirm that delivery. Clearly, if the identifier does not exist, the transaction will not be approved and an error message will be returned. It is important that the dealer controls the correctness of this action, to defend themselves from a malicious employee at the exchange point. However, Fabric transactions are approved quickly enough to make this process smooth.
+
+It is worth noting that the beacon, the other component involved on the exchange point side, is independent from the server. The goal of the two, in fact, is different: the beacon protects the dealer, because the tracker detects it and sends a proof of handover; on the other hand, the web interface protects the intermediate point operator, as it allows their confirmation. Keeping them separate enhances the security of the process. The are only linked in the blockchain ledger, because the beacon identifier must be traceable back to its own organization. 
+
+This approach is actually quite simple, too. There is no real need to link the server to the beacons. Unlike the trackers, beacons do not need a specific operating system nor a back end service. They are just hardware transmitters, which constantly broadcast their identifier using BLE (Bluetooth Low Energy). Once the UUID has been registered they do not require any further attention. However, if they are battery powered, it is important to recharge them or replace the battery periodically. This operation is not necessary with a significant frequency, as the battery life for most devices is approximately one year.
 
 How servers of this type are deployed depends on which type of network we want to build. One possibility is following the same approach as the dealers', grouping the various intermediate stops in organizations that manage them. However, this is not a fixed aspect and the architecture supports different configurations.
 
@@ -405,8 +412,7 @@ The last server offers an interface to the receiver of the good. They can consul
 
 The logic is similar to the intermediate server one: the user inserts the good's identifier and the interface shows the related data, or an error for an invalid request. This information is retrieved from the blockchain using a query. In this service, though, there is no login in needed: we assume that the receiver has obtained the delivery identifier from the sender through another canal (which could be trivially by e-mail, as it happens with traditional services).
 
-This service can be controlled by a single organization, using the ledger in read-only mode to support the receivers and offer them the information they need.
-The last server offers an interface to the receiver of the good. They can consult it whenever they want to check the updates of the delivery and it displays all the transactions that have occurred. 
+This service can be controlled by a single organization, using the ledger in read-only mode to support the receivers and offer them the information they need. 
 
 
 \newpage
