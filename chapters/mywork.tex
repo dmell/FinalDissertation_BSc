@@ -210,11 +210,11 @@ In our use case, the choice is simple: we have a precise set of participants tha
 %\textit{Why (free and open source, easy to use, easy to install and deploy - mentioning Docker), description of what it is and how it works. Schema of our network using their notation.}
 Hyperledger~\cite{hyperledger} is ``an open source collaborative effort created to advance cross-industry blockchain technologies''. In other words, it is a group of related projects and tools, started by the Linux Foundation and supported by many IT companies (such as IBM and Intel), with the goal of offering blockchain-based solutions to build innovative applications. Under the Hyperledger ``umbrella'', there are several frameworks that range from permissionless to permissioned networks, with different targets. In particular, Fabric is the most interesting project for us: it offers a distributed ledger platform designed for industries, with a versatile and highly configurable architecture. It supports even pluggable consensus protocols and identity management protocols, enabling a full extensibility basing on the use case.
 
-In addition, the framework is free, easy to use, install and deploy. More specifically, the Fabric documentation provides the images to run every peer of the network in Docker containers. Docker is a tool designated to create, deploy and run applications in containers~\cite{docker}. Unlike a Virtual Machine, that creates a whole virtual operating system and inevitably implies a significant overhead, a container is just a set of processes that are isolated from the rest of the system. They run from a distinct image that provides all files necessary to support them. A single machine can run several docker containers much more easily than VMs, because all of them share the host kernel.  Finally, Docker is also open-source, thus it is possible for everyone to add more features not available by default. These characteristics of isolation and efficiency are very important for our project, because the servers need to run more than one application (as described in Chapter~\ref{cha:servers}) and performances are fundamental.
+In addition, the framework is free, easy to use, install and deploy. More specifically, the Fabric documentation provides the images to run every peer of the network in Docker containers. Docker is a tool designated to create, deploy and run applications in containers~\cite{docker}. Unlike a Virtual Machine, that creates a whole virtual operating system and inevitably implies a significant overhead, a container is just a set of processes that are isolated from the rest of the system. They run from a distinct image that provides all files necessary to support them. A single machine can run several Docker containers much more easily than VMs, because all of them share the host kernel. These characteristics of isolation and efficiency are very important for our project, because the servers need to run more than one application (as described in Chapter~\ref{cha:servers}) and performances are fundamental. Using Docker, it is enough to use different containers for the various services deployed. Finally, Docker is also open-source, thus it is possible for everyone to add more features not available by default.
 
-% TODO: What is Docker, how a Fabric network works, how to integrate peers with other applications
+% TODO: How a Fabric network works with Docker, how to integrate peers with other applications
 
-To start building a network, Hyperledger provides a set of useful tools, like Composer and Explorer. In fact, it would be rather difficult to configure a network directly working with low level container images and deployment details.
+To start building a network, Hyperledger provides a set of tools. In fact, it would be rather difficult to configure a network by working directly with low level container images and deployment details. As follows, we mainly used the tools Composer and Explorer.
 
 We have introduced a lot of elements that need to be explained in details. In the following sections we describe accurately how Hyperledger Fabric works, how it is composed and how we built our network.
 
@@ -233,14 +233,14 @@ In our system, as outlined previously, the assets are the goods being delivered.
 % in ETH transazioni scatenano contratti
 % ETH non è una crypto, è blockchain
 % fare capire che è un programma, Turing complete bla bla
-Smart contracts are another concept related to a blockchain network: in general, they are self-executing scripts that are triggered by some conditions. For example, Ethereum - another popular permissionless blockchain~\cite{ethereum} - allows developers to program their ``autonomous agents'', using a particular DSL (Domain Specific Language), Solidity. This language is Turing-complete, so the smart contracts are concretely real programs, that can perform a wide range of actions. They can be used, for instance, so that funds are spent only when all the members of an organization (or a fixed percentage of them) give their authorization. 
+Smart contracts are another concept related to a blockchain network: in general, they are self-executing scripts that are triggered by some conditions. For example, Ethereum - another popular permissionless blockchain~\cite{ethereum} - allows developers to program their ``autonomous agents'', using a particular DSL (Domain Specific Language), Solidity. This language is Turing-complete, hence smart contracts are concretely real programs, that can perform a wide range of actions. They can be used, for instance, so that funds are spent only when all the members of an organization (or a fixed percentage of them) give their authorization. 
 
 In the Hyperledger environment, a smart contract defines the business logic that controls the lifecycle of the assets. It is also called \emph{chaincode}, interchangeably, even though the former is the transaction logic itself, while the latter is the container of a group of contracts which is then deployed in the network. 
 
 In our use case, smart contracts are used to manipulate the state of the goods. The functions are executed on the ledger’s current state and are triggered by a transaction proposal. The result is a set of key-value pairs that can be applied to the ledger and distributed over all peers.
 
 \subsubsection{Ledger}
-Focusing now on the ledger itself, it can be described as the list of transactions maintained by each member of the network. It is composed by two parts. First, the \emph{chain}, which is the log of all transactions that have been made, kept in the tamper-resistant blockchain with all the properties outlined in~\ref{sec:decentralization}. Second, the \emph{world state}, representing the latest values for all the keys. 
+Focusing now on the ledger itself, it can be described as the list of transactions maintained by each member of the network. It is composed by two parts. First, the \emph{chain}, which is the log of all transactions that have been made, kept in the tamper-resistant blockchain with all the properties outlined in Section~\ref{sec:decentralization}. Second, the \emph{world state}, representing the latest values for all the keys. 
 
 The current state is very important because it is the layer directly involved when transactions are submitted. To improve efficiency, it is stored in a state database (such as LevelDB or CouchDB), which is basically an indexed view of the transaction log. It can always be regenerated from the chain.
 
@@ -260,7 +260,9 @@ More precisely, each organization is responsible for setting up their peers. Eac
 
 It can be pointed out that an orderer peer is potentially a single point of failure, thus exposing a Fabric network to the same problems of a traditional centralized architecture. If there is only one orderer node, this is true, but a real solution (in production) should consider this issue and avoid it. This point is better clarified in the consensus section.
 
-In our project, it is reasonable to have a single peer per organization acting as orderer and endorser. Unlike other cases, in which the network requires a higher number of endorsing peers, because many transactions are not valid, in our project the interactions are more controlled (by design of the servers, see Chapter~\ref{cha:servers}) and a balanced approach is a good one. This has the advantage of reducing overhead, because both operations are unified in the same peer, but at the same time it requires special protection for those nodes, since they are essential for the organizations. General and anchor peers can be deployed based on the requirements of the entities: if the number of interactions is particularly high, they can consider adding more general peers, to improve load balancing and availability of the service; on the contrary, if an organization does not have these specific requirements it can concentrate everything in one node, representing the anchor and general peer.
+In our project, it is reasonable to have a single peer per organization acting as orderer and endorser. Unlike other cases, in which the network requires a higher number of endorsing peers, because many transactions are not valid, in our project the interactions are more controlled (by design of the servers, see Chapter~\ref{cha:servers}) and a balanced approach is a good one. This has the advantage of reducing overhead, because both operations are unified in the same peer, but at the same time it requires special protection for those nodes, since they are essential for the organizations. General and anchor peers can be deployed based on the requirements of the entities: if the number of interactions is particularly high, they can consider adding more general peers, to improve load balancing and availability of the service; on the contrary, if an organization does not have these specific requirements, it can concentrate everything in one node, representing the anchor and general peer.
+
+The different type of peers, concretely, are deployed as Docker containers. As a result, ideally, a whole Fabric network could be implemented on the same machine. As mentioned before, the coexistence of various containers is made possible by their design. Clearly, a real network has to be distributed, but nothing forbids to have a particular host being both a general and anchor peer, or an orderer and endorser.
 
 \subsubsection{Channels}
 A channel can be simply defined as a virtual tunnel by which the members can connect with each other. Inside a single Fabric network, organizations can have multiple channels, regulated by specific policies. Peers need to authenticate to participate (via the Membership Service Provider) and there have to be an ordering service implemented to guarantee the functioning of the subnet. Each channel has its own ledger, thus communications are made private within the participants.
@@ -268,15 +270,15 @@ A channel can be simply defined as a virtual tunnel by which the members can con
 This is the main reason for which channels are important. In fact, they provide privacy not only between channels, but also towards the whole network. In this way, organizations can decide what they want to share with all the members and what they want to keep private between a subset of them.
 Even though this mechanism might seem contradictory, it is evident that different groups within the network will have a need for different information processes to be shared. Channels provide an efficient and reliable way to satisfy such requirement.
 
-In our skeleton solution we did not include channels. However, they can be appropriate if, for example, the intermediate points are competing with each other, hence they do not want each delivery to be visible publicly. In this case, an ad hoc channel could be created and the various organizations involved would be the participants.
+In our skeleton solution we did not include special channels, only the main one. However, they can be appropriate if, for example, the intermediate points are competing with each other, hence they do not want each delivery to be visible publicly. In this case, an ad hoc channel could be created and the various organizations involved would be the participants.
 
 \subsubsection{Transactions}
-We can summarize the typical Fabric workflow in six steps. Here we consider a complete network with all the types of peers deployed separately. Figure \ref{fig:trans_flow} illustrates the protocol graphically.
+We can summarize the typical Fabric workflow in six steps. Here we consider a complete network with all the types of peers deployed separately. Figure \ref{fig:trans_flow} illustrates the protocol graphically; for the sake of readability, anchor nodes have not been included, so the ledger is directly sent to the general peers.
 
 \begin{figure}[htb]
  \centering{
  \resizebox{0.85\textwidth}{!}{\input{figures/transactionflow.tex}}
- \caption{Schema of the transaction flow. For the sake of readability, anchor nodes have not been included, so the ledger is directly sent to the general peers.}
+ \caption{Schema of the transaction flow}
  \label{fig:trans_flow}
  }
 \end{figure}
@@ -316,7 +318,9 @@ For the development phase, Hyperledger offers some powerful tools, that help mod
 
 \subsection{Hyperledger Composer}
 \label{sec:composer}
-When building a new network it is advisable to start from this tool. The interface, called ``playground'', is very immediate and the documentation explains well how to use the various features offered. It is possible to access it directly from a web page, without installing anything, or loading the local version, that requires the development environment already set up. 
+When building a new network it is advisable to start from this tool. The interface, called \emph{Playground}, is very immediate and the documentation explains well how to use the various features offered. It is possible to access it directly from a web page, without installing anything, or loading the local version, that requires the development environment already set up. 
+
+This tool helps designing a network at a very high level of abstraction. From the Playground interface, there is no reference to endorsement policies, ordering services or other complex structure that we have outlined previously. Consequently, the creation of a network is very straightforward; it is easy to approach the technology and explore the various possible configurations, without considering implementation details. 
 
 To deploy a business network in Composer there are some files that need to be created, in order to define the network properly.
 
@@ -348,7 +352,7 @@ All queries must contain the description and statement properties. The former is
 At this point we have all the elements that qualify a network. The model gives us the structure, the scripts are executed when transactions are submitted and everything is controlled by the access control rules. The missing part is how to actually test a network. Composer provides a test section, to create participants, assets and transitions. Everything is done ``behind the scenes'', by clicking on a graphic interface. On the one hand, this level abstraction is perfect to rapidly test the various files, but on the other there is the need to switch to a more concrete environment and test the real calls. That is why Hyperledger offers Explorer.
 
 \subsection{Hyperledger Explorer}
-After setting up a network using Composer, there is the possibility to deploy a ``Composer REST server''. This server can successively be used to communicate with the blockchain, simulating a real deployed network. Explorer operates between the server and developer, providing an interface with an overview of the functions available. 
+After setting up a network using Composer, there is the possibility to deploy a ``Composer REST server''. Only in this phase it is possible to specify some particular aspects of the network, e.g.\ endorsement policies. This server can successively be used to communicate with the blockchain, simulating a real deployed network. Explorer operates between the server and developer, providing an interface with an overview of the functions available. 
 
 Developers can check information like name, state and list of network nodes, details of blocks, transactions and related data, chaincodes and any other relevant feature that may be stored on the blockchain. Since this data is usually in a format that is difficult to read for humans, this tool attempts to provide an easy visualization by using graphs, charts, pictures, and templates, in addition to the usual search and monitoring facility.
 
@@ -418,5 +422,3 @@ The logic is similar to the intermediate server one: the user inserts the good's
 
 This service can be controlled by a single organization, using the ledger in read-only mode to support the receivers and offer them the information they need. 
 
-
-\newpage
