@@ -1,8 +1,21 @@
 \newpage
 \chapter{Conclusion}
 \label{cha:conclusion}
-\textit{Wrap-up of the work that has been done, insights for the company and for me (by working on this we understood that...). Again a paragraph on the limitations that the solution has, referring to the blockchain, the presence of a human protocol - so the solution is not fully autonomous, the missing testing phase. }
+%\textit{Wrap-up of the work that has been done, insights for the company and for me (by working on this we understood that...). Again a paragraph on the limitations that the solution has, referring to the blockchain, the presence of a human protocol - so the solution is not fully autonomous, the missing testing phase. }
 
-%In every case, it is essential to avoid single points of failure and bearing in mind the a blockchain network is well implemented only if it is not vulnerable against the potential problems of centralized architectures. Otherwise, it is just an unjustified complication.
+In this work we tried to introduce a reliable and secure model to solve the problem of logistics tracking, within entities that do not trust each other. This scenario can occur several times, in many different use cases. The participants can be couriers and simple employees working at exchange points, or even naval authorities and cargo ships. 
+
+We proposed a universal solution, which has not been developed under definitive requirements. It presents a precise idea and some defined mechanisms, but it needs to be adapted to a specific use case.
+
+The problem has been firstly formalized, in order to identify the different entities involved in the scenario. This was necessary to have a defined and formal structure as a base. Then we presented the solution and we scoped down to its components.
+
+In the first part we analyzed the state-of-the-art and the market of IoT trackers, in order to find a device for the geolocation of the dealers. We wrote the firmware and defined a protocol for the communication of updates. Then we moved to the architecture: the goal was to decentralize the solution and create a network of collaborating organizations. After introducing the blockchain and its characteristics, we decided to use a permissioned network. We described how the technology works and its main features. Finally, we reported how we programmed the various servers involved in the architecture.
+
+The solution solves the problem with respect to the initial requirements. Exchanges are registered permanently on the distributed ledger, which can be consulted by the final recipient. Every entity involved in a particular delivery has to give its confirmation, thus each one is always protected against malicious counterparts. These confirmations are done automatically (for the dealers) or manually (for the intermediate points). However, the proposed model has some negatives, primarily related to the use a blockchain, but also for the necessity of a contribution from the people directly involved.
+
+In fact, as explained in the thesis, the blockchain has shown that all the hype that surrounds it is not completely justified: many times this technology is not necessary and in any case it brings a number of limits in terms of performance and maintenance. Nonetheless, permissioned blockchains have the potential to decentralize some services effectively, if well implemented.
+
+The other weak point of our solution is that it requires a human action to function properly: it is not fully automated and this inevitably makes it less secure. Nevertheless, unlike the traditional approach (based on signatures), the model we propose guarantees complete reliability if properly respected, whereas the other one is vulnerable to counterfeiting attacks.
+
 
 % TODO: read some papers about hyperledger fabric, check how they explain the technology to "steal" some sentences and ideas
