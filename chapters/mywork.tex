@@ -213,11 +213,9 @@ Hyperledger is ``an open source collaborative effort created to advance cross-in
 
 In addition, the framework is free, easy to use, install and deploy. More specifically, the Fabric documentation provides the images to run every peer of the network in Docker containers. Docker is a tool designated to create, deploy and run applications in containers~\cite{docker}. Unlike a Virtual Machine, that creates a whole virtual operating system and inevitably implies a significant overhead, a container is just a set of processes that are isolated from the rest of the system. They run from a distinct image that provides all files necessary to support them. A single machine can run several Docker containers much more easily than VMs, because all of them share the host kernel. These characteristics of isolation and efficiency are very important for our project, because the servers need to run more than one application (as described in Chapter~\ref{cha:servers}) and performances are fundamental. Using Docker, it is enough to use different containers for the various services deployed. Finally, Docker is also open-source, thus it is possible for everyone to add more features not available by default.
 
-% TODO: How a Fabric network works with Docker, how to integrate peers with other applications
-
 To start building a network, Hyperledger provides a set of tools. In fact, it would be rather difficult to configure a network by working directly with low level container images and deployment details. As follows, we mainly used the tools Composer and Explorer.
 
-We have introduced a lot of elements that need to be explained in details. In the following sections we describe accurately how Hyperledger Fabric works, how it is composed and how we built our network.
+We have introduced a lot of elements that need to be explained in details. In the following sections, we describe accurately how Hyperledger Fabric works, how it is composed and how we built our network.
 
 \section{Hyperledger Fabric structure}
 \label{sec:fabric_structure}
