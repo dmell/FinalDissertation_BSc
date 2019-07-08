@@ -43,7 +43,7 @@ First, we give a brief description of the modern technologies for the communicat
 \label{sec:track_comm}
 %\textit{A brief analysis over the existing tracking technologies}
 
-The state-of-the-art of these networks is very wide and presents several alternatives, each of them with advantages and disadvantages. They can be divided by many parameters, since many variables need to be taken into account when modelling the architecture of an IoT project. Our use case requires a standard able to guarantee the delivery of packets at arbitrary distance, consuming as little battery as possible. These requirements drive us to a new wireless communication techonology: LPWAN (Low Power Wide Area Network).
+The state-of-the-art of these networks is very wide and presents several alternatives, each of them with advantages and disadvantages. They can be divided by many parameters, since many variables need to be taken into account when modelling the architecture of an IoT project. Our use case requires a standard able to guarantee the delivery of packets at arbitrary distance, consuming as little battery as possible. These requirements drive us to a new wireless communication technology: LPWAN (Low Power Wide Area Network).
 
 LPWAN is increasingly becoming popular thanks to its low-power, long-range and low-cost communication properties. It is particularly suitable for IoT applications that only need to transmit small amounts of data in long range and for its specifications it is preferable to traditional cellular options (such as 4G and LTE networks).
 
@@ -359,6 +359,7 @@ In parallel, it is also possible to connect to the REST server and test the vari
 
 This tool is very helpful to integrate these calls in already existing servers. It is enough to check the APIs, format the requests and use them from another program. In the next chapter we notice how immediate this has been.
 
+\newpage
 
 \chapter{Servers and Interfaces}
 \label{cha:servers}
@@ -374,7 +375,7 @@ The last major part of the project is the development of the various servers. Th
 
 All the servers have been created using the same technology, Express.js. Express is, de facto, the standard server framework for Node.js. It offers a robust set of features to develop web applications. Being extremely simple to set up, it is the best choice to build the minimal web servers that we need.
 
-The following sections describe singularly each server and the messages exchanged. It is necessary to specify that the details reported correspond to an embryonic version, a first implementation not intended for production. As mentioned in the Abstract, the final solution is not deployed yet, thus we concentrate only on the necessary logic. In particular, the programs temporarily use the API provided by the Composer REST server to communicate with the blockchain: in the final version, the destination of these calls will change, but the functioning will stay the same.
+The following sections describe singularly each server and the messages exchanged. It is necessary to specify that the details reported correspond to an embryonic version, a first implementation not intended for production. As mentioned in the Summary, the final solution is not deployed yet, thus we concentrate only on the necessary logic. In particular, the programs temporarily use the API provided by the Composer REST server to communicate with the blockchain: in the final version, the destination of these calls will change, but the functioning will stay the same.
 
 \section{Sender server}
 The first server that we analyze is the sender server. It represents the single service that needs to provide an interface to insert a new good in the system and to specify its route. When the sender connects to the web server, they need to know exactly the details of the delivery: in this first version, the dealers and intermediate stops are reported using their identifiers.
