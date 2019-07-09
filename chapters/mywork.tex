@@ -186,7 +186,7 @@ Being in a limited environment, not all the libraries are available by default: 
 \begin{itemize}
     \item \texttt{ujson}, to read the configuration file and save the unsent messages - this an example of a Python standard module that has been simplified and lightened by MicroPython;
     \item \texttt{L76GNSS}, for geolocation;
-    \item \texttt{umqtt}, to use the tracker as MQTT publisher (see Section~\ref{sec:mqtt});
+    \item \texttt{umqtt}, to use the tracker as MQTT publisher;
     \item \texttt{deepsleep}, to disable the device's features and set the stand-by mode.
 \end{itemize}
 
@@ -348,7 +348,7 @@ This is a file with the purpose of defining some queries to retrieve information
 All queries must contain the description and statement properties. The former is a simple string, which can be used to explain in human language the function of the query, the latter is the query itself. The statement is written in an SQL-like query language and can accept runtime parameters. In our project we did not include this file.
 \vspace{11pt}
 
-At this point we have all the elements that qualify a network. The model gives us the structure, the scripts are executed when transactions are submitted and everything is controlled by the access control rules. The missing part is how to actually test a network. Composer provides a test section, to create participants, assets and transitions. Everything is done ``behind the scenes'', by clicking on a graphic interface. On the one hand, this level abstraction is perfect to rapidly test the various files, but on the other there is the need to switch to a more concrete environment and test the real calls. That is why Hyperledger offers Explorer.
+At this point we have all the elements that qualify a network. The model gives us the structure, the scripts are executed when transactions are submitted and everything is controlled by the access control rules. The missing part is how to actually test a network. Composer provides a test section, to create participants, assets and transitions. Everything is done ``behind the scenes'', by clicking on a graphic interface. On the one hand, this level of abstraction is perfect to rapidly test the various files, but on the other there is the need to switch to a more concrete environment and test the real calls. That is why Hyperledger offers Explorer.
 
 \subsection{Hyperledger Explorer}
 After setting up a network using Composer, there is the possibility to deploy a ``Composer REST server''. Only in this phase it is possible to specify some particular aspects of the network, e.g.\ endorsement policies. This server can successively be used to communicate with the blockchain, simulating a real deployed network. Explorer operates between the server and developer, providing an interface with an overview of the functions available. 
@@ -393,7 +393,7 @@ This server can be split into two parts: the one that receives messages from the
 \label{sec:mqtt}
 All the communications between the trackers and the servers are based on MQTT. MQTT (Message Queuing Telemetry Transport) is an ISO standard messaging protocol. It is based on a publish-subscribe pattern: clients communicate with a server (called \emph{broker}) as publishers or subscribers. Information is organized in topics, a hierarchical structure, similar to folders and files in a file system, using the forward slash as a delimiter. When a publisher sends a new message to the broker, at a certain topic, the broker then distributes the message to all the clients who have subscribed for that topic.
 
-We decided to prefer MQTT over HTTP because it is particularly appropriate for IoT development. In fact, the former is a data-centric light weight protocol, while the latter is more document-centric and includes a significant overhead. MQTT is preferable when there are hard requirements of low battery and bandwidth usage, so it is the best solution for our use case. A complete comparison between the two is reported in~\cite{httpVSmqtt}.
+We decided to prefer MQTT over HTTP because it is particularly appropriate for IoT development. In fact, the former is a data-centric light weight protocol, while the latter is more document-centric and includes a significant overhead. MQTT is preferable when there are hard requirements of low battery and bandwidth usage, hence it is the best solution for our use case. A complete comparison between the two is reported in~\cite{httpVSmqtt}.
 
 In our project, the server is the broker itself, while the devices are the publishers. No subscribers are needed, unless we want to scale in a particular way the servers, (e.g.\ adding other machines, which in that case would have to handle the messages as well). Every tracker communicates at its own topic (\texttt{/deviceIdentifier}), therefore the broker knows immediately which was the sender and can distinguish messages from different devices. Once received, it needs to decide whether to send a confirmation to the blockchain or not.
 
